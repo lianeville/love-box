@@ -42,10 +42,14 @@ function TreasureChest() {
 			const min = -1
 			const max = 0.95
 			const lid = chestLidRef.current.rotation
-			const rotation = state.delta[0] * 0.01
+			const chestAngle = controlsRef.current.getAzimuthalAngle()
+
+			let rotation = state.delta[0] * 0.01
+			if (chestAngle > 0) {
+				rotation = -rotation
+			}
 
 			const newRotationX = Math.min(Math.max(lid.x + rotation, min), max)
-
 			lid.x = newRotationX
 		}
 	}
