@@ -1,51 +1,60 @@
 import { Canvas, useFrame } from "@react-three/fiber/"
 import { useRef, useState, useEffect, useMemo } from "react"
 import "./App.css"
-import { MeshWobbleMaterial, OrbitControls, useHelper } from "@react-three/drei"
-import { DirectionalLightHelper } from "three"
+import { OrbitControls, useHelper } from "@react-three/drei"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+import { useGesture } from "@use-gesture/react"
 
 function TreasureChest() {
 	const loader = new GLTFLoader()
 	const chestLidRef = useRef(null)
 	const chestBaseRef = useRef(null)
 	const [scene, setScene] = useState(null)
+	const controlsRef = useRef(null)
 
 	useEffect(() => {
 		loader.load("/src/assets/3D-Models/Chest_Separated.glb", gltf => {
-			const chestGroup = gltf.scene.children[0] // Assuming the first child is the group
+			const chestGroup = gltf.scene.children[0]
 
 			const lidMesh = chestGroup.children.find(
 				child => child.name === "Chest_Lid"
-			) // Assuming names
+			)
 			const baseMesh = chestGroup.children.find(
 				child => child.name === "Chest_Base"
 			)
 
 			chestLidRef.current = lidMesh
+			console.log(chestLidRef.current)
 			chestBaseRef.current = baseMesh
 
-			setScene(gltf.scene) // Set the entire scene for context
+			setScene(gltf.scene)
 		})
-	}, []) // Empty dependency array to run only once
+	}, [])
 
-	const handleLidOpen = () => {
-		// Implement logic to adjust chestLidRef.current.position.y when opening
-		// Example:
+	const handleDragEnd = () => {
+		controlsRef.current.enableRotate = true
+	}
+
+	const handleDrag = state => {
+		controlsRef.current.enableRotate = false
+		// Check if chestLidRef is defined before accessing its properties
 		if (chestLidRef.current) {
-			console.log("hi")
-			chestLidRef.current.position.y += 0.5 // Adjust Y position for opening animation
+			chestLidRef.current.rotation.x += state.delta[0] * 0.01 // Adjust sensitivity
 		}
 	}
+
+	const bind = useGesture({ onDrag: handleDrag, onDragEnd: handleDragEnd })
 
 	return (
 		<>
 			{scene && (
 				<>
 					<primitive object={chestBaseRef.current} />
-					<primitive
-						object={chestLidRef.current}
-						onClick={handleLidOpen}
+					<primitive {...bind()} object={chestLidRef.current} />
+					<OrbitControls
+						ref={controlsRef}
+						enableZoom={false}
+						enablePan={false}
 					/>
 				</>
 			)}
@@ -53,50 +62,16 @@ function TreasureChest() {
 	)
 }
 
-// function Sphere({ position, size, color }) {
-// 	const ref = useRef()
-
-// 	const [isHovered, setIsHovered] = useState(false)
-// 	const [isClicked, setIsClicked] = useState(false)
-
-// 	useFrame((state, delta) => {
-// 		const speed = isHovered ? 1 : 0.5
-// 		ref.current.rotation.y += delta * speed
-// 	})
-
-// 	return (
-// 		<mesh
-// 			position={position}
-// 			ref={ref}
-// 			onPointerEnter={event => (event.stopPropagation, setIsHovered(true))}
-// 			onPointerLeave={() => setIsHovered(false)}
-// 			onClick={() => setIsClicked(!isClicked)}
-// 			scale={isClicked ? 1.5 : 1}
-// 		>
-// 			<sphereGeometry args={size} />
-// 			<meshStandardMaterial
-// 				color={isHovered ? "orange" : "lightblue"}
-// 				wireframe
-// 			/>
-// 		</mesh>
-// 	)
-// }
-
 function Scene() {
-	const directionalLightRef = useRef()
-	useHelper(directionalLightRef, DirectionalLightHelper)
+	// const directionalLightRef = useRef()
+	// useHelper(directionalLightRef, DirectionalLightHelper)
 
 	return (
 		<>
 			<ambientLight intensity={1.5} />
-			<directionalLight
-				// ref={directionalLightRef}
-				position={[0, 0, 2]}
-				intensity={1}
-			/>
+			<directionalLight position={[0, 0, 2]} intensity={1} />
 
 			<TreasureChest />
-			<OrbitControls enableZoom={false} />
 		</>
 	)
 }
