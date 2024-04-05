@@ -4,6 +4,7 @@ import { Canvas, useFrame } from "@react-three/fiber/"
 import { OrbitControls, useHelper } from "@react-three/drei"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { useGesture } from "@use-gesture/react"
+import gsap from "gsap"
 
 function TreasureChest() {
 	const loader = new GLTFLoader()
@@ -11,6 +12,8 @@ function TreasureChest() {
 	const chestBaseRef = useRef(null)
 	const [scene, setScene] = useState(null)
 	const controlsRef = useRef(null)
+	const lidMinX = -1
+	const lidMaxX = 0.95
 
 	useEffect(() => {
 		loader.load("/src/assets/3D-Models/Chest_Separated.glb", gltf => {
@@ -31,16 +34,27 @@ function TreasureChest() {
 		})
 	}, [])
 
-	const handleDragEnd = () => {
-		controlsRef.current.enableRotate = true
+	function checkLidRotation() {
+		if (chestLidRef.current) {
+			const lid = chestLidRef.current.rotation
+
+			gsap.to(lid, {
+				x: lid.x > 0.5 ? lidMaxX : lidMinX, // Set the final position to lidMaxX
+				duration: 0.25, // Set the duration of the animation to 0.5 seconds
+				ease: "power2.out", // Add easing for a smoother animation (optional)
+			})
+		}
 	}
 
-	const handleDrag = state => {
+	function handleDragEnd() {
+		controlsRef.current.enableRotate = true
+		checkLidRotation()
+	}
+
+	function handleDrag(state) {
 		controlsRef.current.enableRotate = false
 
 		if (chestLidRef.current) {
-			const min = -1
-			const max = 0.95
 			const lid = chestLidRef.current.rotation
 			const chestAngle = controlsRef.current.getAzimuthalAngle()
 
@@ -49,7 +63,8 @@ function TreasureChest() {
 				rotation = -rotation
 			}
 
-			const newRotationX = Math.min(Math.max(lid.x + rotation, min), max)
+			const intermediateValue = Math.max(lid.x + rotation, lidMinX)
+			const newRotationX = Math.min(intermediateValue, lidMaxX)
 			lid.x = newRotationX
 		}
 	}
