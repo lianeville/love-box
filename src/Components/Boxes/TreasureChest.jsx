@@ -14,6 +14,7 @@ function TreasureChest() {
 	const controlsRef = useRef(null)
 	const lidMinX = -1
 	const lidMaxX = 0.95
+	let dragInitialX = lidMaxX
 
 	useEffect(() => {
 		loader.load("/src/assets/3D-Models/Chest_Separated.glb", gltf => {
@@ -27,7 +28,6 @@ function TreasureChest() {
 			)
 
 			chestLidRef.current = lidMesh
-			console.log(chestLidRef.current.rotation.x)
 			chestBaseRef.current = baseMesh
 
 			setScene(gltf.scene)
@@ -38,15 +38,31 @@ function TreasureChest() {
 		if (chestLidRef.current) {
 			const lid = chestLidRef.current.rotation
 
+			let finalX = 0
+			if (dragInitialX > -1) {
+				// Lid starts from closed
+				finalX = lid.x > 0.55 ? lidMaxX : lidMinX
+			} else {
+				// Lid starts from open
+				finalX = lid.x > -0.55 ? lidMaxX : lidMinX
+			}
+
 			gsap.to(lid, {
-				x: lid.x > 0.5 ? lidMaxX : lidMinX, // Set the final position to lidMaxX
+				x: finalX, // Set the final position
 				duration: 0.25, // Set the duration of the animation to 0.5 seconds
 				ease: "power2.out", // Add easing for a smoother animation (optional)
 			})
 		}
 	}
 
-	function handleDragEnd() {
+	function handleDragStart() {
+		if (chestLidRef.current) {
+			const lid = chestLidRef.current.rotation
+			dragInitialX = lid.x
+		}
+	}
+
+	function handleDragEnd(event) {
 		controlsRef.current.enableRotate = true
 		checkLidRotation()
 	}
@@ -69,7 +85,11 @@ function TreasureChest() {
 		}
 	}
 
-	const bind = useGesture({ onDrag: handleDrag, onDragEnd: handleDragEnd })
+	const bind = useGesture({
+		onDrag: handleDrag,
+		onDragStart: handleDragStart,
+		onDragEnd: handleDragEnd,
+	})
 
 	return (
 		<>
