@@ -1,10 +1,10 @@
-import { useRef, useState, useEffect, useMemo } from "react"
-import { Canvas, useFrame } from "@react-three/fiber/"
-
-import { OrbitControls, useHelper } from "@react-three/drei"
+import { useRef, useState, useEffect } from "react"
+import { OrbitControls } from "@react-three/drei"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { useGesture } from "@use-gesture/react"
+import Note from "../Note"
 import gsap from "gsap"
+import { RigidBody, CuboidCollider, Physics } from "@react-three/rapier"
 
 function TreasureChest() {
 	const loader = new GLTFLoader()
@@ -48,9 +48,9 @@ function TreasureChest() {
 			}
 
 			gsap.to(lid, {
-				x: finalX, // Set the final position
-				duration: 0.25, // Set the duration of the animation to 0.5 seconds
-				ease: "power2.out", // Add easing for a smoother animation (optional)
+				x: finalX,
+				duration: 0.25,
+				ease: "power2.out",
 			})
 		}
 	}
@@ -74,8 +74,13 @@ function TreasureChest() {
 			const lid = chestLidRef.current.rotation
 			const chestAngle = controlsRef.current.getAzimuthalAngle()
 
+			const lookingFromFront = chestAngle > -0.25 && chestAngle < 0.25
+			const lookingFromRight = chestAngle > 0
+
 			let rotation = state.delta[0] * 0.01
-			if (chestAngle > 0) {
+			if (lookingFromFront) {
+				rotation = state.delta[1] * 0.01
+			} else if (lookingFromRight) {
 				rotation = -rotation
 			}
 
@@ -91,17 +96,35 @@ function TreasureChest() {
 		onDragEnd: handleDragEnd,
 	})
 
+	function getRandomPositionInChestBase() {
+		const minX = -0.5
+		const maxX = 0.5
+		const minY = -0.4
+		const maxY = 1
+		// const maxY = -0.3
+		const minZ = 0.4
+		const maxZ = 1.3
+
+		return [
+			Math.random() * (maxX - minX) + minX,
+			Math.random() * (maxY - minY) + minY,
+			Math.random() * (maxZ - minZ) + minZ,
+		]
+	}
+
 	return (
 		<>
 			{scene && (
 				<>
+					<Note position={getRandomPositionInChestBase()} />
+					<Note position={getRandomPositionInChestBase()} />
+					<Note position={getRandomPositionInChestBase()} />
+					<Note position={getRandomPositionInChestBase()} />
+					<Note position={getRandomPositionInChestBase()} />
+					<Note position={getRandomPositionInChestBase()} />
 					<primitive object={chestBaseRef.current} />
 					<primitive {...bind()} object={chestLidRef.current} />
-					<OrbitControls
-						ref={controlsRef}
-						// enableZoom={false}
-						// enablePan={false}
-					/>
+					<OrbitControls ref={controlsRef} enableZoom={true} />
 				</>
 			)}
 		</>
