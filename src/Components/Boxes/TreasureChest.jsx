@@ -1,11 +1,12 @@
 import { useRef, useState, useEffect } from "react"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { useGesture } from "@use-gesture/react"
-import Note from "../Note"
 import gsap from "gsap"
-import { useGLTF, OrbitControls, Stage, Sphere, Plane } from "@react-three/drei"
-import * as THREE from "three"
+import { OrbitControls } from "@react-three/drei"
 import { RigidBody } from "@react-three/rapier"
+
+import Note from "../Note"
+import ChestCollider from "../Colliders/ChestCollider"
 
 function TreasureChest() {
 	const loader = new GLTFLoader()
@@ -20,17 +21,10 @@ function TreasureChest() {
 
 	useEffect(() => {
 		loader.load("/src/assets/3D-Models/Chest_Separated.glb", gltf => {
-			const chestGroup = gltf.scene.children[0]
+			const chestGroup = gltf.scene.children[0].children
 
-			const lidMesh = chestGroup.children.find(
-				child => child.name === "Chest_Lid"
-			)
-			const baseMesh = chestGroup.children.find(
-				child => child.name === "Chest_Base"
-			)
-
-			chestLidRef.current = lidMesh
-			chestBaseRef.current = baseMesh
+			chestLidRef.current = chestGroup[1]
+			chestBaseRef.current = chestGroup[0]
 
 			setScene(gltf.scene)
 		})
@@ -39,13 +33,12 @@ function TreasureChest() {
 	function checkLidRotation() {
 		if (chestLidRef.current) {
 			const lid = chestLidRef.current.rotation
+			const isStartingFromClosed = dragInitialX > -1
 
 			let finalX = 0
-			if (dragInitialX > -1) {
-				// Lid starts from closed
+			if (isStartingFromClosed) {
 				finalX = lid.x > 0.55 ? lidMaxX : lidMinX
 			} else {
-				// Lid starts from open
 				finalX = lid.x > -0.55 ? lidMaxX : lidMinX
 			}
 
@@ -58,13 +51,11 @@ function TreasureChest() {
 	}
 
 	function handleDragStart() {
-		if (chestLidRef.current) {
-			const lid = chestLidRef.current.rotation
-			dragInitialX = lid.x
-		}
+		const lid = chestLidRef.current.rotation
+		dragInitialX = lid.x
 	}
 
-	function handleDragEnd(event) {
+	function handleDragEnd() {
 		controlsRef.current.enableRotate = true
 		checkLidRotation()
 	}
@@ -102,7 +93,6 @@ function TreasureChest() {
 		const minX = -0.5
 		const maxX = 0.5
 		const minY = -0.4
-		// const maxY = 3
 		const maxY = -0.3
 		const minZ = 0.4
 		const maxZ = 1.3
@@ -112,48 +102,6 @@ function TreasureChest() {
 			Math.random() * (maxY - minY) + minY,
 			Math.random() * (maxZ - minZ) + minZ,
 		]
-	}
-
-	function PlaneCollider({ args, position, isRotatedY, isRotatedX }) {
-		return (
-			<Plane
-				args={args ?? [0.062, 0.04]}
-				rotation-x={isRotatedX ? -Math.PI / 2 : 0}
-				rotation-y={isRotatedY ? -Math.PI / 2 : 0}
-				// material-color="hidden"
-				material-opacity={0}
-				material-transparent={true}
-				material-side={THREE.DoubleSide}
-				position={position}
-			/>
-		)
-	}
-
-	function ChestCollider(props) {
-		return (
-			<RigidBody
-				colliders="hull"
-				type="fixed"
-				scale={20}
-				position={[0, -0.75, 0.91]}
-			>
-				<PlaneCollider
-					isRotatedX
-					args={[0.075, 0.075]}
-					position={[0, 0.017, 0]}
-				></PlaneCollider>
-				<PlaneCollider position={[0, 0.02, 0.031]}></PlaneCollider>
-				<PlaneCollider position={[0, 0.02, -0.031]}></PlaneCollider>
-				<PlaneCollider
-					position={[-0.031, 0.02, 0]}
-					isRotatedY
-				></PlaneCollider>
-				<PlaneCollider
-					position={[0.031, 0.02, 0]}
-					isRotatedY
-				></PlaneCollider>
-			</RigidBody>
-		)
 	}
 
 	return (
