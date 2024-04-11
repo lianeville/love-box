@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useMemo } from "react"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+import { RigidBody } from "@react-three/rapier"
 
 function Note({ position }) {
 	const loader = new GLTFLoader()
@@ -17,11 +18,13 @@ function Note({ position }) {
 	return (
 		<>
 			{scene && (
-				<primitive
-					object={noteRef.current}
-					scale={0.5}
-					position={position}
-				/>
+				<RigidBody colliders="hull" type="dynamic">
+					<primitive
+						position={position}
+						object={noteRef.current}
+						scale={0.5}
+					/>
+				</RigidBody>
 			)}
 		</>
 	)

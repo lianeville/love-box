@@ -1,10 +1,11 @@
 import { useRef, useState, useEffect } from "react"
-import { OrbitControls } from "@react-three/drei"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { useGesture } from "@use-gesture/react"
 import Note from "../Note"
 import gsap from "gsap"
-import { RigidBody, CuboidCollider, Physics } from "@react-three/rapier"
+import { useGLTF, OrbitControls, Stage, Sphere, Plane } from "@react-three/drei"
+import * as THREE from "three"
+import { RigidBody } from "@react-three/rapier"
 
 function TreasureChest() {
 	const loader = new GLTFLoader()
@@ -14,6 +15,7 @@ function TreasureChest() {
 	const controlsRef = useRef(null)
 	const lidMinX = -1
 	const lidMaxX = 0.95
+
 	let dragInitialX = lidMaxX
 
 	useEffect(() => {
@@ -74,7 +76,7 @@ function TreasureChest() {
 			const lid = chestLidRef.current.rotation
 			const chestAngle = controlsRef.current.getAzimuthalAngle()
 
-			const lookingFromFront = chestAngle > -0.25 && chestAngle < 0.25
+			const lookingFromFront = chestAngle > -0.35 && chestAngle < 0.35
 			const lookingFromRight = chestAngle > 0
 
 			let rotation = state.delta[0] * 0.01
@@ -100,8 +102,8 @@ function TreasureChest() {
 		const minX = -0.5
 		const maxX = 0.5
 		const minY = -0.4
-		const maxY = 1
-		// const maxY = -0.3
+		// const maxY = 3
+		const maxY = -0.3
 		const minZ = 0.4
 		const maxZ = 1.3
 
@@ -112,6 +114,48 @@ function TreasureChest() {
 		]
 	}
 
+	function PlaneCollider({ args, position, isRotatedY, isRotatedX }) {
+		return (
+			<Plane
+				args={args ?? [0.062, 0.04]}
+				rotation-x={isRotatedX ? -Math.PI / 2 : 0}
+				rotation-y={isRotatedY ? -Math.PI / 2 : 0}
+				// material-color="hidden"
+				material-opacity={0}
+				material-transparent={true}
+				material-side={THREE.DoubleSide}
+				position={position}
+			/>
+		)
+	}
+
+	function ChestCollider(props) {
+		return (
+			<RigidBody
+				colliders="hull"
+				type="fixed"
+				scale={20}
+				position={[0, -0.75, 0.91]}
+			>
+				<PlaneCollider
+					isRotatedX
+					args={[0.075, 0.075]}
+					position={[0, 0.017, 0]}
+				></PlaneCollider>
+				<PlaneCollider position={[0, 0.02, 0.031]}></PlaneCollider>
+				<PlaneCollider position={[0, 0.02, -0.031]}></PlaneCollider>
+				<PlaneCollider
+					position={[-0.031, 0.02, 0]}
+					isRotatedY
+				></PlaneCollider>
+				<PlaneCollider
+					position={[0.031, 0.02, 0]}
+					isRotatedY
+				></PlaneCollider>
+			</RigidBody>
+		)
+	}
+
 	return (
 		<>
 			{scene && (
@@ -120,9 +164,11 @@ function TreasureChest() {
 					<Note position={getRandomPositionInChestBase()} />
 					<Note position={getRandomPositionInChestBase()} />
 					<Note position={getRandomPositionInChestBase()} />
-					<Note position={getRandomPositionInChestBase()} />
-					<Note position={getRandomPositionInChestBase()} />
+					<RigidBody colliders={"hull"} type="fixed">
+						<ChestCollider />
+					</RigidBody>
 					<primitive object={chestBaseRef.current} />
+
 					<primitive {...bind()} object={chestLidRef.current} />
 					<OrbitControls ref={controlsRef} enableZoom={true} />
 				</>
