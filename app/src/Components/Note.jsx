@@ -10,7 +10,6 @@ function Note({ position }) {
 	useEffect(() => {
 		loader.load("/src/assets/3D-Models/Note_Folded.glb", gltf => {
 			noteRef.current = gltf.scene.children[0]
-			console.log(noteRef.current)
 			setScene(gltf.scene)
 		})
 	}, [])
