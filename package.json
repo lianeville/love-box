@@ -1,0 +1,10 @@
+{
+	"dependencies": {
+		"concurrently": "^8.2.2"
+	},
+	"scripts": {
+		"start-dev": "concurrently \"npm run start-app\" \"npm run start-api\"",
+		"start-app": "cd app/ && npm run dev",
+		"start-api": "cd api/ && nodemon -r dotenv/config server.js"
+	}
+}
