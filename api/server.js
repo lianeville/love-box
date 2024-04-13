@@ -17,10 +17,12 @@ app.listen(port, () => {
 	console.log(`Server is running on port ${port}`)
 })
 
+async function getNotes(noteIds) {}
+
 app.get("/box/:boxId", async (req, res) => {
 	try {
-		const boxId = new ObjectId(req.params.boxId) // Extract boxId from URL
-		const box = await boxCollection.findOne(boxId) // Find box by ObjectId
+		const boxId = new ObjectId(req.params.boxId)
+		const box = await boxCollection.findOne(boxId)
 
 		if (!box) {
 			return res.status(404).json({ error: "Box not found" })

@@ -12,6 +12,7 @@ function PlaneCol({ args, position, isRotatedY, isRotatedX }) {
 			args={args}
 			rotation-x={rotationX}
 			rotation-y={rotationY}
+			material-color="hotpink"
 			material-opacity={0}
 			material-transparent={true}
 			material-side={THREE.DoubleSide}
@@ -31,6 +32,7 @@ function ChestCollider() {
 	return (
 		<RigidBody {...colliderProps}>
 			<PlaneCol isRotatedX args={[0.075, 0.075]} position={[0, 0.017, 0]} />
+			<PlaneCol isRotatedX args={[0.075, 0.075]} position={[0, 0.04, 0]} />
 			<PlaneCol position={[0, 0.02, 0.031]}></PlaneCol>
 			<PlaneCol position={[0, 0.02, -0.031]}></PlaneCol>
 			<PlaneCol position={[-0.031, 0.02, 0]} isRotatedY></PlaneCol>

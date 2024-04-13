@@ -92,14 +92,14 @@ function TreasureChest() {
 	function getRandomPositionInChestBase() {
 		const minX = -0.5
 		const maxX = 0.5
-		const minY = -0.4
-		const maxY = -0.3
+		// const minY = -0.2
+		// const maxY = -0.2
 		const minZ = 0.4
 		const maxZ = 1.3
 
 		return [
 			Math.random() * (maxX - minX) + minX,
-			Math.random() * (maxY - minY) + minY,
+			-0.2,
 			Math.random() * (maxZ - minZ) + minZ,
 		]
 	}

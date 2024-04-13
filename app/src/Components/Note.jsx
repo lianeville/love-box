@@ -18,11 +18,16 @@ function Note({ position }) {
 	return (
 		<>
 			{scene && (
-				<RigidBody colliders="hull" type="dynamic">
+				<RigidBody colliders="hull" type="static">
 					<primitive
 						position={position}
 						object={noteRef.current}
 						scale={0.5}
+						rotation={[
+							Math.random() * Math.PI * 2,
+							Math.random() * Math.PI * 2,
+							Math.random() * Math.PI * 2,
+						]}
 					/>
 				</RigidBody>
 			)}
