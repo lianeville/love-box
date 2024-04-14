@@ -1,27 +1,23 @@
+import { useEffect } from "react"
 import "./App.css"
 import ModelViewer from "./ModelViews"
-import { create } from "zustand"
-const dbHost = import.meta.env.VITE_DB_HOST
-
-const useBoxStore = create(set => ({
-	activeBox: 2,
-	inc: () => set(state => ({ activeBox: 5 })),
-}))
-
-function ChestHi() {
-	const { activeBox, loadBox } = useBoxStore()
-
-	return (
-		<button className="h-6 w-6 bg-gray-200 text-black" onClick={loadBox}>
-			{activeBox}
-		</button>
-	)
-}
+import useBoxStore from "./store"
 
 function App() {
+	const { activeBox, loadBox } = useBoxStore()
+	let noteCount = 0
+
+	// useEffect(() => {
+	// 	loadBox("6619e6838f8673bd5fd0a994")
+	// }, [])
+
+	// useEffect(() => {
+	// 	console.log(activeBox)
+	// 	noteCount = activeBox.receiver_notes.length
+	// }, [activeBox])
+
 	return (
 		<div className="h-full flex">
-			<ChestHi></ChestHi>
 			<ModelViewer />
 		</div>
 	)

@@ -1,6 +1,7 @@
 const express = require("express")
 const dotenv = require("dotenv")
 const { MongoClient, ObjectId } = require("mongodb")
+const cors = require("cors")
 
 dotenv.config()
 
@@ -13,6 +14,8 @@ const client = new MongoClient(mongoURI)
 const db = client.db(dbName)
 const boxCollection = db.collection("Boxes")
 const noteCollection = db.collection("Notes")
+
+app.use(cors())
 
 app.listen(port, () => {
 	console.log(`Server is running on port ${port}`)

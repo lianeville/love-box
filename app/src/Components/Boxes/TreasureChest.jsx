@@ -4,6 +4,7 @@ import { useGesture } from "@use-gesture/react"
 import gsap from "gsap"
 import { OrbitControls } from "@react-three/drei"
 import { RigidBody } from "@react-three/rapier"
+import useBoxStore from "../../store"
 
 import Note from "../Note"
 import ChestCollider from "../Colliders/ChestCollider"
@@ -14,6 +15,8 @@ function TreasureChest() {
 	const chestBaseRef = useRef(null)
 	const [scene, setScene] = useState(null)
 	const controlsRef = useRef(null)
+	const { activeBox, loadBox } = useBoxStore()
+	const [noteCount, setNoteCount] = useState(0)
 	const lidMinX = -1
 	const lidMaxX = 0.95
 
@@ -29,6 +32,16 @@ function TreasureChest() {
 			setScene(gltf.scene)
 		})
 	}, [])
+
+	useEffect(() => {
+		loadBox("6619e6838f8673bd5fd0a994")
+	}, [])
+
+	useEffect(() => {
+		if (activeBox == null) return
+		console.log(activeBox.receiver_notes)
+		setNoteCount(activeBox.receiver_notes.length)
+	}, [activeBox])
 
 	function checkLidRotation() {
 		if (chestLidRef.current) {
@@ -89,36 +102,26 @@ function TreasureChest() {
 		onDragEnd: handleDragEnd,
 	})
 
-	function getRandomPositionInChestBase() {
-		const minX = -0.5
-		const maxX = 0.5
-		// const minY = -0.2
-		// const maxY = -0.2
-		const minZ = 0.4
-		const maxZ = 1.3
-
-		return [
-			Math.random() * (maxX - minX) + minX,
-			-0.2,
-			Math.random() * (maxZ - minZ) + minZ,
-		]
-	}
+	const notePositions = [-0.5, 0.5, -0.2, -0.2, 0.4, 1.3]
 
 	return (
 		<>
 			{scene && (
 				<>
-					<Note position={getRandomPositionInChestBase()} />
-					<Note position={getRandomPositionInChestBase()} />
-					<Note position={getRandomPositionInChestBase()} />
-					<Note position={getRandomPositionInChestBase()} />
+					{Array.from({ length: noteCount }, (_, index) => (
+						<Note key={index} positions={notePositions} />
+					))}
 					<RigidBody colliders={"hull"} type="fixed">
 						<ChestCollider />
 					</RigidBody>
 					<primitive object={chestBaseRef.current} />
 
 					<primitive {...bind()} object={chestLidRef.current} />
-					<OrbitControls ref={controlsRef} enableZoom={true} />
+					<OrbitControls
+						target={[0, 0, 0.75]}
+						ref={controlsRef}
+						enableZoom={true}
+					/>
 				</>
 			)}
 		</>
