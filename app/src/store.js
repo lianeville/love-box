@@ -20,4 +20,8 @@ const useBoxStore = create(set => ({
 	},
 }))
 
+const useNoteStore = create(set => ({
+	//
+}))
+
 export default useBoxStore

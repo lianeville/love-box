@@ -17,6 +17,18 @@ function getRandomPositions(positions) {
 	]
 }
 
+function getRandomRotation() {
+	return [
+		Math.random() * Math.PI * 2,
+		Math.random() * Math.PI * 2,
+		Math.random() * Math.PI * 2,
+	]
+}
+
+function noteClick() {
+	console.log("hi")
+}
+
 function Note({ positions }) {
 	const loader = new GLTFLoader()
 	const [scene, setScene] = useState(null)
@@ -39,11 +51,8 @@ function Note({ positions }) {
 						position={positions}
 						object={noteRef.current}
 						scale={0.5}
-						rotation={[
-							Math.random() * Math.PI * 2,
-							Math.random() * Math.PI * 2,
-							Math.random() * Math.PI * 2,
-						]}
+						onClick={noteClick}
+						rotation={getRandomRotation()}
 					/>
 				</RigidBody>
 			)}
