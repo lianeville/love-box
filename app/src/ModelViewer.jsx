@@ -36,8 +36,8 @@ function ModelViewer() {
 
 			<PerspectiveCamera
 				makeDefault
-				fov={70}
-				zoom={1}
+				// fov={70}
+				zoom={0.65}
 				near={1}
 				far={2000}
 				position={[0, 0, 200]}

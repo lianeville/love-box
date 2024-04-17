@@ -70,12 +70,13 @@ function TreasureChest({ noteCount }) {
 			const lookingFromFront = chestAngle > -0.35 && chestAngle < 0.35
 			const lookingFromRight = chestAngle > 0
 
-			let rotation = state.delta[0] * 0.01
+			let rotation = state.delta[0]
 			if (lookingFromFront) {
-				rotation = state.delta[1] * 0.01
+				rotation = state.delta[1]
 			} else if (lookingFromRight) {
 				rotation = -rotation
 			}
+			rotation *= 0.0075
 
 			const intermediateValue = Math.max(lid.x + rotation, lidMinX)
 			const newRotationX = Math.min(intermediateValue, lidMaxX)
@@ -99,22 +100,21 @@ function TreasureChest({ noteCount }) {
 		<>
 			{scene && (
 				<>
-					{Array.from({ length: noteCount }, (_, index) => (
-						<Note key={index} positions={notePositions} />
-					))}
-
-					<RigidBody colliders={"hull"} type="fixed">
-						<ChestCollider />
-					</RigidBody>
-
-					<primitive object={chestBaseRef.current} />
-					<primitive {...lidGestures()} object={chestLidRef.current} />
-
-					<OrbitControls
-						target={[0, 0, 0.75]}
-						ref={controlsRef}
-						enableZoom={true}
-					/>
+					<group scale={[40, 40, 40]}>
+						{Array.from({ length: noteCount }, (_, index) => (
+							<Note key={index} positions={notePositions} />
+						))}
+						<RigidBody colliders={"hull"} type="fixed">
+							<ChestCollider />
+						</RigidBody>
+						<primitive object={chestBaseRef.current} />
+						<primitive {...lidGestures()} object={chestLidRef.current} />
+						<OrbitControls
+							target={[0, 0, 33]}
+							ref={controlsRef}
+							enableZoom={true}
+						/>
+					</group>
 				</>
 			)}
 		</>

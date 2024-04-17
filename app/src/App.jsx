@@ -30,8 +30,14 @@ function App() {
 				<ModelViewer />
 			</div>
 
-			<div className="pb-6 fixed bottom-0 left-1/2 right-1/2">
-				<div className="h-10 w-10 bg-slate-200"></div>
+			<div className="mb-10 fixed bottom-0 left-1/2 right-1/2">
+				<div className="h-16 w-16">
+					<img
+						className="w-full h-full"
+						src="/src/assets/icons/treasure-chest.webp"
+						alt=""
+					/>
+				</div>
 			</div>
 		</div>
 	)

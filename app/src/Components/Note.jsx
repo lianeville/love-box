@@ -46,7 +46,7 @@ function Note({ positions }) {
 	return (
 		<>
 			{scene && (
-				<RigidBody colliders="hull" type="static">
+				<RigidBody colliders="hull" type="dynamic" gravityScale={5}>
 					<primitive
 						position={positions}
 						object={noteRef.current}
