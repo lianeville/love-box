@@ -94,15 +94,13 @@ function TreasureChest({ noteCount }) {
 		checkLidRotation()
 	}
 
-	const notePositions = [-0.5, 0.5, -0.2, -0.2, 0.4, 1.3]
-
 	return (
 		<>
 			{scene && (
 				<>
 					<group scale={[40, 40, 40]}>
 						{Array.from({ length: noteCount }, (_, index) => (
-							<Note key={index} positions={notePositions} />
+							<Note key={index} position={[0, -0.33, 1]} />
 						))}
 						<RigidBody colliders={"hull"} type="fixed">
 							<ChestCollider />

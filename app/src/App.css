@@ -9,7 +9,7 @@ body,
 }
 
 body {
-	background-color: #222;
+	@apply bg-background;
 	margin: 0;
 	padding: 0;
 }

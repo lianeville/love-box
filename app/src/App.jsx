@@ -22,18 +22,20 @@ function App() {
 	return (
 		<div className="h-full flex flex-col">
 			<Header />
-			<div className="h-0 z-10 flex justify-center">
-				<span className="static mt-5 text-5xl">{boxName}</span>
-			</div>
 
-			<div className="h-full flex flex-col">
+			<BoxLabel name={boxName} />
+			{/* <div className="h-0 z-10 flex justify-center">
+				<span className="static mt-5 text-5xl">{boxName}</span>
+			</div> */}
+
+			<div className="h-full flex flex-col flex-shrink">
 				<ModelViewer />
 			</div>
 
-			<div className="mb-10 fixed bottom-0 left-1/2 right-1/2">
-				<div className="h-16 w-16">
+			<div className="w-full fixed bottom-0 p-6">
+				<div className="h-24 w-full bg-header py-3 px-6 rounded-md">
 					<img
-						className="w-full h-full"
+						className="h-full"
 						src="/src/assets/icons/treasure-chest.webp"
 						alt=""
 					/>
