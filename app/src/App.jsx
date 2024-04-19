@@ -4,6 +4,7 @@ import ModelViewer from "./ModelViewer"
 import useBoxStore from "./store"
 import BoxLabel from "./Components/BoxLabel"
 import Header from "./Components/Header"
+import BoxList from "./Components/BoxList"
 
 function App() {
 	const { activeBox, loadBox } = useBoxStore()
@@ -22,25 +23,13 @@ function App() {
 	return (
 		<div className="h-full flex flex-col">
 			<Header />
-
 			<BoxLabel name={boxName} />
-			{/* <div className="h-0 z-10 flex justify-center">
-				<span className="static mt-5 text-5xl">{boxName}</span>
-			</div> */}
 
 			<div className="h-full flex flex-col flex-shrink">
 				<ModelViewer />
 			</div>
 
-			<div className="w-full fixed bottom-0 p-6">
-				<div className="h-24 w-full bg-header py-3 px-6 rounded-md">
-					<img
-						className="h-full"
-						src="/src/assets/icons/treasure-chest.webp"
-						alt=""
-					/>
-				</div>
-			</div>
+			<BoxList />
 		</div>
 	)
 }

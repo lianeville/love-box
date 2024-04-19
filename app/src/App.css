@@ -17,3 +17,8 @@ body {
 img {
 	max-width: inherit;
 }
+
+header {
+	font-family: "Slabo 27px", serif;
+	font-size: 28px;
+}
