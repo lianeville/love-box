@@ -17,12 +17,18 @@ function TreasureChest({ noteCount }) {
 	const controlsRef = useRef(null)
 	const lidMinX = -1
 	const lidMaxX = 0.95
-	const [primaryNotePos, setPrimaryNotePos] = useState(-0.5)
+	const [primaryNotePos, setPrimaryNotePos] = useState(dampenY(lidMinX))
 	const [dragInitialX, setDragInitialX] = useState(lidMaxX)
 
 	useEffect(() => {
 		loadModels()
 	}, [])
+
+	function dampenY(y) {
+		const alpha = 0.4
+		const dampenedY = alpha * y + (1 - alpha) - 0.2
+		return dampenedY
+	}
 
 	function loadModels() {
 		loader.load("/src/assets/3D-Models/Chest_Separated.glb", gltf => {
@@ -51,7 +57,8 @@ function TreasureChest({ noteCount }) {
 			duration: 0.25,
 			ease: "power2.out",
 			onUpdate: () => {
-				setPrimaryNotePos(Math.max(-lid.x, -0.5))
+				setPrimaryNotePos(dampenY(-lid.x))
+				// setPrimaryNotePos(Math.max(-lid.x, -0.5))
 			},
 		})
 	}
@@ -77,7 +84,8 @@ function TreasureChest({ noteCount }) {
 			const intermediateValue = Math.max(lid.x + rotation, lidMinX)
 			const newRotationX = Math.min(intermediateValue, lidMaxX)
 			lid.x = newRotationX
-			setPrimaryNotePos(Math.max(-newRotationX, -0.5))
+			setPrimaryNotePos(dampenY(-newRotationX))
+			// setPrimaryNotePos(Math.max(-newRotationX, -0.5))
 		},
 		onDragStart: () => {
 			const lid = chestLidRef.current.rotation
