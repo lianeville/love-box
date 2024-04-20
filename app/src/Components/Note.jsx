@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useMemo } from "react"
+import { useRef, useState, useEffect, memo } from "react"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { RigidBody } from "@react-three/rapier"
 
@@ -16,11 +16,7 @@ function getRandomPositions(position) {
 // 	return [0, Math.random() * Math.PI * 2, 0]
 // }
 
-function noteClick() {
-	console.log("hi")
-}
-
-function Note({ position }) {
+function NoteBeforeMemo({ position }) {
 	const loader = new GLTFLoader()
 	const [scene, setScene] = useState(null)
 	const noteRef = useRef(null)
@@ -42,13 +38,13 @@ function Note({ position }) {
 						position={position}
 						object={noteRef.current}
 						scale={0.5}
-						onClick={noteClick}
-						// rotation={getRandomRotation()}
 					/>
 				</RigidBody>
 			)}
 		</>
 	)
 }
+
+const Note = memo(NoteBeforeMemo)
 
 export default Note
