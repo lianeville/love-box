@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, useMemo } from "react"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { RigidBody } from "@react-three/rapier"
 
-function NoteSeparated({ positionY }) {
+function NotePrimary({ positionY }) {
 	const loader = new GLTFLoader()
 	const [scene, setScene] = useState(null)
 	const noteLeftRef = useRef(null)
@@ -45,4 +45,4 @@ function NoteSeparated({ positionY }) {
 	)
 }
 
-export default NoteSeparated
+export default NotePrimary

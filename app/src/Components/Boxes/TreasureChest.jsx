@@ -4,7 +4,7 @@ import { useGesture, useDrag } from "@use-gesture/react"
 import gsap from "gsap"
 import { OrbitControls, PivotControls, DragControls } from "@react-three/drei"
 import { RigidBody } from "@react-three/rapier"
-import NoteSeparated from "../NoteSeparated"
+import NotePrimary from "../NotePrimary"
 
 import Note from "../Note"
 import ChestCollider from "../Colliders/ChestCollider"
@@ -17,10 +17,8 @@ function TreasureChest({ noteCount }) {
 	const controlsRef = useRef(null)
 	const lidMinX = -1
 	const lidMaxX = 0.95
-	const [lidX, setLidX] = useState(lidMaxX)
-	const [mainNotePos, setMainNotePos] = useState(lidMaxX)
-
-	let dragInitialX = lidMaxX
+	const [primaryNotePos, setPrimaryNotePos] = useState(-0.5)
+	const [dragInitialX, setDragInitialX] = useState(lidMaxX)
 
 	useEffect(() => {
 		loadModels()
@@ -38,24 +36,24 @@ function TreasureChest({ noteCount }) {
 	}
 
 	function checkLidRotation() {
-		if (chestLidRef.current) {
-			const lid = chestLidRef.current.rotation
-			const isStartingFromClosed = dragInitialX > -1
+		const lid = chestLidRef.current.rotation
+		const isStartingFromClosed = dragInitialX > -1
 
-			let finalX = 0
-			if (isStartingFromClosed) {
-				finalX = lid.x > 0.55 ? lidMaxX : lidMinX
-				setMainNotePos(-lidMinX)
-			} else {
-				finalX = lid.x > -0.55 ? lidMaxX : lidMinX
-			}
-
-			gsap.to(lid, {
-				x: finalX,
-				duration: 0.25,
-				ease: "power2.out",
-			})
+		let finalX = 0
+		if (isStartingFromClosed) {
+			finalX = lid.x > 0.65 ? lidMaxX : lidMinX
+		} else {
+			finalX = lid.x > -0.65 ? lidMaxX : lidMinX
 		}
+
+		gsap.to(lid, {
+			x: finalX,
+			duration: 0.25,
+			ease: "power2.out",
+			onUpdate: () => {
+				setPrimaryNotePos(Math.max(-lid.x, -0.5))
+			},
+		})
 	}
 
 	const lidGestures = useGesture({
@@ -79,14 +77,11 @@ function TreasureChest({ noteCount }) {
 			const intermediateValue = Math.max(lid.x + rotation, lidMinX)
 			const newRotationX = Math.min(intermediateValue, lidMaxX)
 			lid.x = newRotationX
-			// console.log(lidGestures)
-			// setLidX(newRotationX)
-			setMainNotePos(-newRotationX)
+			setPrimaryNotePos(Math.max(-newRotationX, -0.5))
 		},
 		onDragStart: () => {
-			console.log("ref")
 			const lid = chestLidRef.current.rotation
-			dragInitialX = lid.x
+			setDragInitialX(lid.x)
 		},
 		onDragEnd: () => {
 			controlsRef.current.enableRotate = true
@@ -107,7 +102,7 @@ function TreasureChest({ noteCount }) {
 							<ChestCollider />
 						</RigidBody>
 
-						<NoteSeparated positionY={mainNotePos} />
+						<NotePrimary positionY={primaryNotePos} />
 
 						<primitive object={chestBaseRef.current} />
 						<primitive {...lidGestures()} object={chestLidRef.current} />
