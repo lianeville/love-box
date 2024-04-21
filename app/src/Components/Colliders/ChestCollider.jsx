@@ -2,10 +2,6 @@ import { Plane } from "@react-three/drei"
 import { RigidBody } from "@react-three/rapier"
 import * as THREE from "three"
 
-function topClick() {
-	console.log("hi")
-}
-
 function PlaneCol({ args, position, isRotatedY, isRotatedX }) {
 	const rotationX = isRotatedX ? -Math.PI / 2 : 0
 	const rotationY = isRotatedY ? -Math.PI / 2 : 0

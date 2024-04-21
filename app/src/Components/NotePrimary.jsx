@@ -19,26 +19,21 @@ function NotePrimary({ positionY }) {
 
 	const gestures = useGesture({
 		onDrag: event => {},
-		onDragStart: event => {
-			console.log("note drag start")
-			console.log(event.distance)
-		},
+		onDragStart: event => {},
 		onDragEnd: () => {},
 	})
 
 	return (
 		<>
 			{scene && (
-				<RigidBody
-					colliders="hull"
-					gravityScale={10}
+				<group
 					position={[0, positionY, 0.39]}
 					rotation={[0, Math.PI * 0.8, Math.PI / 2]}
 					scale={0.9}
 				>
 					<primitive {...gestures()} object={noteLeftRef.current} />
 					<primitive object={noteRightRef.current} />
-				</RigidBody>
+				</group>
 			)}
 		</>
 	)

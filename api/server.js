@@ -135,9 +135,7 @@ app.post("/login", async (req, res) => {
 
 // Example route to get all boxes of each type for the logged-in user
 app.get("/user/boxes", async (req, res) => {
-	const authToken = req.body.authorization
-
-	console.log(authToken)
+	const authToken = req.headers.authorization
 
 	if (!authToken || !authToken.startsWith("Bearer ")) {
 		return res
@@ -151,11 +149,11 @@ app.get("/user/boxes", async (req, res) => {
 		const userId = decodedToken.userId
 
 		// Check if the user ID from the token matches the logged-in user's ID
-		if (userId !== req.body.user._id) {
-			return res
-				.status(401)
-				.json({ error: "Unauthorized - Token does not match user ID" })
-		}
+		// if (userId !== req.body.user._id) {
+		// 	return res
+		// 		.status(401)
+		// 		.json({ error: "Unauthorized - Token does not match user ID" })
+		// }
 
 		const { createdBoxes, receivedBoxes } = await getBoxesByType(userId)
 		res.json({ createdBoxes, receivedBoxes })

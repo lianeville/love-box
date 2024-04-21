@@ -18,7 +18,6 @@ function Home() {
 
 	useEffect(() => {
 		if (activeBox == null) return
-		console.log(activeBox)
 		setBoxName(activeBox.name_by_creator)
 	}, [activeBox])
 
