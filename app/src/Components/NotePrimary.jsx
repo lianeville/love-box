@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useMemo } from "react"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { RigidBody } from "@react-three/rapier"
+import { useGesture } from "@use-gesture/react"
 
 function NotePrimary({ positionY }) {
 	const loader = new GLTFLoader()
@@ -16,6 +17,15 @@ function NotePrimary({ positionY }) {
 		})
 	}, [])
 
+	const gestures = useGesture({
+		onDrag: event => {},
+		onDragStart: event => {
+			console.log("note drag start")
+			console.log(event.distance)
+		},
+		onDragEnd: () => {},
+	})
+
 	return (
 		<>
 			{scene && (
@@ -26,19 +36,8 @@ function NotePrimary({ positionY }) {
 					rotation={[0, Math.PI * 0.8, Math.PI / 2]}
 					scale={0.9}
 				>
-					<primitive
-						object={noteLeftRef.current}
-						// scale={0.5}
-						// onClick={noteClick}
-						// rotation={getRandomRotation()}
-					/>
-					<primitive
-						// position={position}
-						object={noteRightRef.current}
-						// scale={0.5}
-						// onClick={noteClick}
-						// rotation={getRandomRotation()}
-					/>
+					<primitive {...gestures()} object={noteLeftRef.current} />
+					<primitive object={noteRightRef.current} />
 				</RigidBody>
 			)}
 		</>

@@ -4,7 +4,10 @@ function Header() {
 			<a href="/" className="bg-label px-3 py-1 rounded-lg text-labelText">
 				Love Box
 			</a>
-			<a href="/" className="bg-label px-3 py-1 rounded-lg text-labelText">
+			<a
+				href="/login"
+				className="bg-label px-3 py-1 rounded-lg text-labelText"
+			>
 				Log In
 			</a>
 		</header>

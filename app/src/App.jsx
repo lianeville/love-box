@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import "./App.css"
 import ModelViewer from "./ModelViewer"
 import useBoxStore from "./store"
 import BoxLabel from "./Components/BoxLabel"
 import Header from "./Components/Header"
 import BoxList from "./Components/BoxList"
+import Login from "./Components/Routes/Login"
 
-function App() {
+function Home() {
 	const { activeBox, loadBox } = useBoxStore()
 	let [boxName, setBoxName] = useState("")
 
@@ -21,8 +23,7 @@ function App() {
 	}, [activeBox])
 
 	return (
-		<div className="h-full flex flex-col">
-			<Header />
+		<>
 			<BoxLabel name={boxName} />
 
 			<div className="h-full flex flex-col flex-shrink">
@@ -30,6 +31,21 @@ function App() {
 			</div>
 
 			<BoxList />
+		</>
+	)
+}
+
+function App() {
+	return (
+		<div className="h-full flex flex-col">
+			<Header />
+
+			<Router>
+				<Routes>
+					<Route path="/" element={<Home />} />
+					<Route path="/login" element={<Login />} />
+				</Routes>
+			</Router>
 		</div>
 	)
 }

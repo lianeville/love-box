@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, memo } from "react"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
-import { useGesture, useDrag } from "@use-gesture/react"
+import { useGesture } from "@use-gesture/react"
 import gsap from "gsap"
 import { OrbitControls, PivotControls, DragControls } from "@react-three/drei"
 import { RigidBody } from "@react-three/rapier"
@@ -58,7 +58,6 @@ function TreasureChest({ noteCount }) {
 			ease: "power2.out",
 			onUpdate: () => {
 				setPrimaryNotePos(dampenY(-lid.x))
-				// setPrimaryNotePos(Math.max(-lid.x, -0.5))
 			},
 		})
 	}
@@ -85,7 +84,6 @@ function TreasureChest({ noteCount }) {
 			const newRotationX = Math.min(intermediateValue, lidMaxX)
 			lid.x = newRotationX
 			setPrimaryNotePos(dampenY(-newRotationX))
-			// setPrimaryNotePos(Math.max(-newRotationX, -0.5))
 		},
 		onDragStart: () => {
 			const lid = chestLidRef.current.rotation
