@@ -26,7 +26,6 @@ const Login = () => {
 
 			const { message, tokens } = await response.json()
 
-			console.log(message)
 			const accessToken = JSON.parse(tokens).access
 			const accessRefresh = JSON.parse(tokens).refresh
 
@@ -34,10 +33,7 @@ const Login = () => {
 			document.cookie = `accessToken=${accessToken}; path=/`
 			document.cookie = `refreshToken=${accessRefresh}; path=/`
 
-			// console.log("Login successful:", message)
-
-			// Navigate to home page or any other route
-			// navigate("/")
+			navigate("/")
 		} catch (error) {
 			console.error("Error logging in:", error)
 		}

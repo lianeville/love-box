@@ -27,8 +27,6 @@ function BoxList() {
 			if (parts.length === 2) cookies[name] = parts.pop().split(";").shift()
 		})
 
-		console.log("cookies", cookies)
-
 		return cookies
 	}
 

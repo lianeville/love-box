@@ -10,7 +10,8 @@ dotenv.config()
 const port = process.env.PORT || 3000
 const mongoURI = process.env.mongoURI
 const dbName = process.env.dbName
-const JWT_SECRET = process.env.JWT_SECRET
+const JWT_SECRET_ACCESS = process.env.JWT_SECRET_ACCESS
+const JWT_SECRET_REFRESH = process.env.JWT_SECRET_REFRESH
 const app = express()
 
 const client = new MongoClient(mongoURI)
@@ -44,11 +45,11 @@ async function getNotes(noteIds) {
 // })
 
 function generateAccessToken(user) {
-	return jwt.sign(user, JWT_SECRET, { expiresIn: "1h" })
+	return jwt.sign(user, JWT_SECRET_ACCESS, { expiresIn: "1h" })
 }
 
 function generateRefreshToken(user) {
-	return jwt.sign(user, JWT_SECRET, { expiresIn: "30d" })
+	return jwt.sign(user, JWT_SECRET_REFRESH, { expiresIn: "30d" })
 }
 
 async function loginUser(email, password) {
@@ -72,8 +73,6 @@ async function loginUser(email, password) {
 
 		// Generate a JWT token for the authenticated user
 		const tokens = { access: accessToken, refresh: refreshToken }
-
-		console.log(tokens)
 
 		return { message: "Login successful", tokens: JSON.stringify(tokens) }
 	} catch (err) {
@@ -128,7 +127,10 @@ app.get("/refresh-token", async (req, res) => {
 	}
 
 	try {
-		const decodedToken = jwt.verify(refreshToken, process.env.JWT_SECRET)
+		const decodedToken = jwt.verify(
+			refreshToken,
+			process.env.JWT_SECRET_REFRESH
+		)
 		const userId = decodedToken.user_id
 		const userEmail = decodedToken.email
 
@@ -156,10 +158,11 @@ app.get("/user/boxes", async (req, res) => {
 	}
 
 	try {
-		const decodedToken = jwt.verify(accessToken, process.env.JWT_SECRET)
+		const decodedToken = jwt.verify(
+			accessToken,
+			process.env.JWT_SECRET_ACCESS
+		)
 		const userId = decodedToken.user_id
-
-		console.log("tokenData", decodedToken)
 
 		const { createdBoxes, receivedBoxes } = await getBoxesByType(userId)
 		res.json({ createdBoxes, receivedBoxes })
