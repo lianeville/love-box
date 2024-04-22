@@ -24,15 +24,20 @@ const Login = () => {
 				throw new Error("Network response was not ok")
 			}
 
-			const { message, token } = await response.json()
+			const { message, tokens } = await response.json()
+
+			console.log(message)
+			const accessToken = JSON.parse(tokens).access
+			const accessRefresh = JSON.parse(tokens).refresh
 
 			// Store token in cookie
-			document.cookie = `token=${token}; path=/`
+			document.cookie = `accessToken=${accessToken}; path=/`
+			document.cookie = `refreshToken=${accessRefresh}; path=/`
 
-			console.log("Login successful:", message)
+			// console.log("Login successful:", message)
 
 			// Navigate to home page or any other route
-			navigate("/")
+			// navigate("/")
 		} catch (error) {
 			console.error("Error logging in:", error)
 		}

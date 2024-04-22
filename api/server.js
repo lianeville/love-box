@@ -43,27 +43,13 @@ async function getNotes(noteIds) {
 
 // })
 
-// async function loginUser(email, password) {
-// 	try {
-// 		const user = await usersCollection.findOne({ email })
-// 		if (!user) {
-// 			throw new Error("User not found")
-// 		}
+function generateAccessToken(user) {
+	return jwt.sign(user, JWT_SECRET, { expiresIn: "1h" })
+}
 
-// 		// const isPasswordValid = await bcrypt.compare(password, user.password)
-// 		// if (!isPasswordValid) {
-// 		// 	throw new Error("Invalid password")
-// 		// }
-
-// 		// You can include additional data or tokens in the response
-// 		return {
-// 			message: "Login successful",
-// 			user: { _id: user._id, email: user.email },
-// 		}
-// 	} catch (err) {
-// 		throw err
-// 	}
-// }
+function generateRefreshToken(user) {
+	return jwt.sign(user, JWT_SECRET, { expiresIn: "30d" })
+}
 
 async function loginUser(email, password) {
 	try {
@@ -79,16 +65,17 @@ async function loginUser(email, password) {
 		// 	throw new Error("Invalid password")
 		// }
 
-		// Generate a JWT token for the authenticated user
-		const token = jwt.sign(
-			{ userId: user._id, email: user.email },
-			JWT_SECRET,
-			{
-				expiresIn: "1h",
-			}
-		)
+		const userData = { user_id: user._id, email: user.email }
 
-		return { message: "Login successful", token }
+		const accessToken = generateAccessToken(userData)
+		const refreshToken = generateRefreshToken(userData)
+
+		// Generate a JWT token for the authenticated user
+		const tokens = { access: accessToken, refresh: refreshToken }
+
+		console.log(tokens)
+
+		return { message: "Login successful", tokens: JSON.stringify(tokens) }
 	} catch (err) {
 		throw err
 	}
@@ -125,35 +112,54 @@ app.post("/login", async (req, res) => {
 	}
 
 	try {
-		const { message, token } = await loginUser(email, password)
-		res.json({ message, token })
+		const { message, tokens } = await loginUser(email, password)
+		res.json({ message, tokens })
 	} catch (err) {
 		console.error("Error logging in:", err.message)
 		res.status(401).json({ error: "Invalid credentials" })
 	}
 })
 
-// Example route to get all boxes of each type for the logged-in user
-app.get("/user/boxes", async (req, res) => {
-	const authToken = req.headers.authorization
+app.get("/refresh-token", async (req, res) => {
+	let refreshToken = req.headers.refresh
 
-	if (!authToken || !authToken.startsWith("Bearer ")) {
-		return res
-			.status(401)
-			.json({ error: "Unauthorized - Missing or invalid token" })
+	if (!refreshToken) {
+		return res.status(401).json({ error: "Unauthorized - Missing tokens" })
 	}
 
-	const token = authToken.split(" ")[1] // Extracting the JWT token from the Authorization header
 	try {
-		const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
-		const userId = decodedToken.userId
+		const decodedToken = jwt.verify(refreshToken, process.env.JWT_SECRET)
+		const userId = decodedToken.user_id
+		const userEmail = decodedToken.email
 
-		// Check if the user ID from the token matches the logged-in user's ID
-		// if (userId !== req.body.user._id) {
-		// 	return res
-		// 		.status(401)
-		// 		.json({ error: "Unauthorized - Token does not match user ID" })
-		// }
+		const userData = { user_id: userId, email: userEmail }
+
+		const accessToken = generateAccessToken(userData)
+		refreshToken = generateRefreshToken(userData)
+
+		const tokens = { access: accessToken, refresh: refreshToken }
+
+		res.json(JSON.stringify(tokens))
+		return { message: "Login successful", tokens: JSON.stringify(tokens) }
+	} catch (err) {
+		console.error("Invalid Refresh Token:", err)
+		res.status(401).json({ error: "Unauthorized - Invalid token" })
+	}
+})
+
+// Example route to get all boxes of each type for the logged-in user
+app.get("/user/boxes", async (req, res) => {
+	const accessToken = req.headers.access
+
+	if (!accessToken) {
+		return res.status(401).json({ error: "Unauthorized - Missing token" })
+	}
+
+	try {
+		const decodedToken = jwt.verify(accessToken, process.env.JWT_SECRET)
+		const userId = decodedToken.user_id
+
+		console.log("tokenData", decodedToken)
 
 		const { createdBoxes, receivedBoxes } = await getBoxesByType(userId)
 		res.json({ createdBoxes, receivedBoxes })
