@@ -79,9 +79,8 @@ function BoxList() {
 			let tokens = await response.json()
 			tokens = JSON.parse(tokens)
 
-			// Save the refreshed tokens as cookies
-			document.cookie = `accessToken=${tokens.access}; HttpOnly; Secure; SameSite=Strict;`
-			document.cookie = `refreshToken=${tokens.refresh}; HttpOnly; Secure; SameSite=Strict;`
+			document.cookie = `accessToken=${tokens.access}; path=/`
+			document.cookie = `refreshToken=${tokens.refresh}; path=/`
 
 			return tokens
 		} catch (error) {

@@ -40,12 +40,8 @@ async function getNotes(noteIds) {
 	}
 }
 
-// app.get("/boxes", async (req, res) => {
-
-// })
-
 function generateAccessToken(user) {
-	return jwt.sign(user, JWT_SECRET_ACCESS, { expiresIn: "1h" })
+	return jwt.sign(user, JWT_SECRET_ACCESS, { expiresIn: "10s" })
 }
 
 function generateRefreshToken(user) {
@@ -167,8 +163,12 @@ app.get("/user/boxes", async (req, res) => {
 		const { createdBoxes, receivedBoxes } = await getBoxesByType(userId)
 		res.json({ createdBoxes, receivedBoxes })
 	} catch (err) {
-		console.error("Error getting boxes:", err)
-		res.status(401).json({ error: "Unauthorized - Invalid token" })
+		if (err.name == "TokenExpiredError") {
+			res.status(401).json({ error: "Access Token Expired" })
+		} else {
+			console.error("Error getting boxes:", err)
+			res.status(401).json({ error: "Unauthorized - Invalid token" })
+		}
 	}
 })
 
