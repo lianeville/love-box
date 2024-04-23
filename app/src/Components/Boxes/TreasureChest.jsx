@@ -5,6 +5,7 @@ import gsap from "gsap"
 import { OrbitControls, PivotControls, DragControls } from "@react-three/drei"
 import { RigidBody } from "@react-three/rapier"
 import NotePrimary from "../NotePrimary"
+import { useNoteStore } from "../../store"
 
 import Note from "../Note"
 import ChestCollider from "../Colliders/ChestCollider"
@@ -19,6 +20,7 @@ function TreasureChest({ noteCount }) {
 	const lidMaxX = 0.95
 	const [primaryNotePos, setPrimaryNotePos] = useState(dampenY(lidMinX))
 	const [dragInitialX, setDragInitialX] = useState(lidMaxX)
+	const { isDraggingNote, setIsDraggingNote } = useNoteStore()
 
 	useEffect(() => {
 		loadModels()
@@ -64,6 +66,8 @@ function TreasureChest({ noteCount }) {
 
 	const lidGestures = useGesture({
 		onDrag: event => {
+			if (isDraggingNote) return
+
 			controlsRef.current.enableRotate = false
 
 			const lid = chestLidRef.current.rotation
@@ -111,7 +115,12 @@ function TreasureChest({ noteCount }) {
 						<NotePrimary positionY={primaryNotePos} />
 
 						<primitive object={chestBaseRef.current} />
-						<primitive {...lidGestures()} object={chestLidRef.current} />
+						<primitive
+							// onPointerUp={e => console.log("chest:", e.distance)}
+							{...lidGestures()}
+							// onPointerDown={e => console.log("chest:", e.distance)}
+							object={chestLidRef.current}
+						/>
 
 						<OrbitControls
 							target={[0, 0, 33]}

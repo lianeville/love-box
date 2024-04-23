@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber/"
 import TreasureChest from "./Components/Boxes/TreasureChest"
 import { Physics } from "@react-three/rapier"
 import { OrthographicCamera, PerspectiveCamera } from "@react-three/drei"
-import useBoxStore from "./store"
+import { useBoxStore } from "./store"
 
 function ModelViewer() {
 	const { activeBox, loadBox } = useBoxStore()

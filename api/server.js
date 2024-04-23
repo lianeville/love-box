@@ -41,7 +41,7 @@ async function getNotes(noteIds) {
 }
 
 function generateAccessToken(user) {
-	return jwt.sign(user, JWT_SECRET_ACCESS, { expiresIn: "10s" })
+	return jwt.sign(user, JWT_SECRET_ACCESS, { expiresIn: "15m" })
 }
 
 function generateRefreshToken(user) {

@@ -2,11 +2,11 @@ import { useEffect, useState } from "react"
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import "./App.css"
 import ModelViewer from "./ModelViewer"
-import useBoxStore from "./store"
 import BoxLabel from "./Components/BoxLabel"
 import Header from "./Components/Header"
 import BoxList from "./Components/BoxList"
 import Login from "./Components/Routes/Login"
+import { useBoxStore } from "./store"
 
 function Home() {
 	const { activeBox, loadBox } = useBoxStore()

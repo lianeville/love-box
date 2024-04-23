@@ -21,7 +21,8 @@ const useBoxStore = create(set => ({
 }))
 
 const useNoteStore = create(set => ({
-	//
+	isDraggingNote: false,
+	setIsDraggingNote: newValue => set({ isDraggingNote: newValue }),
 }))
 
-export default useBoxStore
+export { useBoxStore, useNoteStore }

@@ -18,12 +18,9 @@ function BoxList() {
 	}, [boxes])
 
 	async function getBoxes(accessToken, refreshToken) {
+		const url = dbHost + "/user/boxes"
 		try {
-			const boxes = await fetchWithToken(
-				dbHost + "/user/boxes",
-				accessToken,
-				refreshToken
-			)
+			const boxes = await fetchWithToken(url, accessToken, refreshToken)
 			setBoxes(boxes)
 		} catch (error) {
 			console.error("Error getting boxes:", error)
@@ -31,7 +28,7 @@ function BoxList() {
 	}
 
 	return (
-		<div className="w-full fixed bottom-0 p-6">
+		<div className="w-full fixed bottom-0 p-6 select-none">
 			<div className="h-24 w-full bg-header py-3 px-6 rounded-md">
 				<img
 					className="h-full"
