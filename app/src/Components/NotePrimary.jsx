@@ -3,13 +3,17 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { RigidBody } from "@react-three/rapier"
 import { useGesture } from "@use-gesture/react"
 import { useNoteStore } from "../store"
+import gsap from "gsap"
 
-function NotePrimary({ positionY }) {
+function NotePrimary({ positionY, cameraRef }) {
 	const loader = new GLTFLoader()
 	const [scene, setScene] = useState(null)
 	const noteLeftRef = useRef(null)
 	const noteRightRef = useRef(null)
 	const { isDraggingNote, setIsDraggingNote } = useNoteStore()
+
+	const leftMostNoteX = -2.25
+	const rightMostNoteX = 0.25
 
 	useEffect(() => {
 		loader.load("/src/assets/3D-Models/Note_Separated.glb", gltf => {
@@ -19,33 +23,43 @@ function NotePrimary({ positionY }) {
 		})
 	}, [])
 
-	useEffect(() => {
-		console.log("isDraggingNote", isDraggingNote)
-	}, [isDraggingNote])
-
 	const gestures = useGesture({
 		onDrag: event => {
-			// console.log("dragging")
+			cameraRef.current.enableRotate = false
+
+			const note = noteRightRef.current.rotation
+
+			let rotation = (event.delta[0] *= 0.022)
+
+			const intermediateValue = Math.max(
+				note.x + rotation,
+				leftMostNoteX - 0.25
+			)
+			const newRotationX = Math.min(intermediateValue, rightMostNoteX)
+
+			note.x = newRotationX
 		},
 		onDragStart: event => {},
-		onDragEnd: () => {},
+		onDragEnd: () => {
+			cameraRef.current.enableRotate = true
+			const note = noteRightRef.current.rotation
+			checkNoteRotation(note)
+		},
 	})
 
+	function checkNoteRotation(note) {
+		let finalX = note.x < -1.5 ? leftMostNoteX : rightMostNoteX - 0.25
+
+		gsap.to(note, {
+			x: finalX,
+			duration: 0.25,
+			ease: "power2.out",
+		})
+	}
+
 	function checkIntersections(e) {
-		// console.log(e.intersections)
-		// setIsDraggingNote(false)
-		// console.log(isDraggingNote)
-		// let planeDistance = 0
-		// let chestDistance = Infinity
-		// console.log(e.intersections[0].object.name)
 		const closestMesh = e.intersections[0].object.name
 		if (closestMesh == "PlaneRight") setIsDraggingNote(true)
-		// e.intersections.forEach(mesh => {
-		// 	console.log(mesh.object.name)
-		// 	// if (mesh.object.name == "Chest_Lid") {
-		// 	// 	chestDistance =
-		// 	// }
-		// })
 	}
 
 	function disableDragging() {

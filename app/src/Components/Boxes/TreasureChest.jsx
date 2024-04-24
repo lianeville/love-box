@@ -15,7 +15,7 @@ function TreasureChest({ noteCount }) {
 	const chestLidRef = useRef(null)
 	const chestBaseRef = useRef(null)
 	const [scene, setScene] = useState(null)
-	const controlsRef = useRef(null)
+	const cameraRef = useRef(null)
 	const lidMinX = -1
 	const lidMaxX = 0.95
 	const [primaryNotePos, setPrimaryNotePos] = useState(dampenY(lidMinX))
@@ -68,10 +68,10 @@ function TreasureChest({ noteCount }) {
 		onDrag: event => {
 			if (isDraggingNote) return
 
-			controlsRef.current.enableRotate = false
+			cameraRef.current.enableRotate = false
 
 			const lid = chestLidRef.current.rotation
-			const chestAngle = controlsRef.current.getAzimuthalAngle()
+			const chestAngle = cameraRef.current.getAzimuthalAngle()
 
 			const lookingFromFront = chestAngle > -0.35 && chestAngle < 0.35
 			const lookingFromRight = chestAngle > 0
@@ -94,7 +94,7 @@ function TreasureChest({ noteCount }) {
 			setDragInitialX(lid.x)
 		},
 		onDragEnd: () => {
-			controlsRef.current.enableRotate = true
+			cameraRef.current.enableRotate = true
 			checkLidRotation()
 		},
 	})
@@ -112,7 +112,10 @@ function TreasureChest({ noteCount }) {
 							<ChestCollider />
 						</RigidBody>
 
-						<NotePrimary positionY={primaryNotePos} />
+						<NotePrimary
+							cameraRef={cameraRef}
+							positionY={primaryNotePos}
+						/>
 
 						<primitive object={chestBaseRef.current} />
 						<primitive
@@ -124,7 +127,7 @@ function TreasureChest({ noteCount }) {
 
 						<OrbitControls
 							target={[0, 0, 33]}
-							ref={controlsRef}
+							ref={cameraRef}
 							enableZoom={true}
 						/>
 					</group>
