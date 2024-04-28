@@ -10,7 +10,7 @@ import { useNoteStore } from "../../store"
 import Note from "../Note"
 import ChestCollider from "../Colliders/ChestCollider"
 
-function TreasureChest({ noteCount }) {
+function TreasureChest({ noteCount, perspectiveCamRef }) {
 	const loader = new GLTFLoader()
 	const chestLidRef = useRef(null)
 	const chestBaseRef = useRef(null)
@@ -24,6 +24,7 @@ function TreasureChest({ noteCount }) {
 
 	useEffect(() => {
 		loadModels()
+		// console.log("perspectiveCamRef", perspectiveCamRef.current)
 	}, [])
 
 	function dampenY(y) {
@@ -118,17 +119,12 @@ function TreasureChest({ noteCount }) {
 						/>
 
 						<primitive object={chestBaseRef.current} />
-						<primitive
-							// onPointerUp={e => console.log("chest:", e.distance)}
-							{...lidGestures()}
-							// onPointerDown={e => console.log("chest:", e.distance)}
-							object={chestLidRef.current}
-						/>
+						<primitive {...lidGestures()} object={chestLidRef.current} />
 
 						<OrbitControls
 							target={[0, 0, 33]}
 							ref={cameraRef}
-							enableZoom={true}
+							enableZoom={false}
 						/>
 					</group>
 				</>

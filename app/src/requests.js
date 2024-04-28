@@ -1,4 +1,5 @@
 const dbHost = import.meta.env.VITE_DB_HOST
+import { useNavigate } from "react-router-dom"
 
 export function getCookies(cookieNames) {
 	const cookies = {}
@@ -13,7 +14,16 @@ export function getCookies(cookieNames) {
 	return cookies
 }
 
-export async function fetchWithToken(url, accessToken, refreshToken) {
+export async function fetchWithToken(url) {
+	const { accessToken, refreshToken } = getCookies([
+		"accessToken",
+		"refreshToken",
+	])
+
+	if (!accessToken || !refreshToken) {
+		window.location.href = window.location.origin + "/login"
+	}
+
 	try {
 		const response = await fetch(url, {
 			method: "GET",
@@ -52,7 +62,12 @@ async function refreshTokenRequest(refreshToken) {
 			},
 		})
 
-		if (!response.ok) return false
+		if (!response.ok) {
+			console.warn("Couldn't refresh tokens.")
+			const navigate = useNavigate
+			navigate("/login")
+			return null
+		}
 
 		let tokens = await response.json()
 		tokens = JSON.parse(tokens)
@@ -61,7 +76,9 @@ async function refreshTokenRequest(refreshToken) {
 
 		return tokens
 	} catch (error) {
-		console.error("Error refreshing tokens:", error)
+		console.warn("Couldn't refresh tokens.")
+		const navigate = useNavigate
+		navigate("/login")
 		return null
 	}
 }

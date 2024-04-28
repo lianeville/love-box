@@ -1,26 +1,30 @@
 import { useEffect, useState } from "react"
-import { fetchWithToken, getCookies } from "../requests"
+import { fetchWithToken } from "../requests"
+// import { fetchWithToken, getCookies } from "../requests"
 const dbHost = import.meta.env.VITE_DB_HOST
 
 function BoxList() {
 	const [boxes, setBoxes] = useState(null)
 
 	useEffect(() => {
-		const { accessToken, refreshToken } = getCookies([
-			"accessToken",
-			"refreshToken",
-		])
-		getBoxes(accessToken, refreshToken)
+		// const { accessToken, refreshToken } = getCookies([
+		// 	"accessToken",
+		// 	"refreshToken",
+		// ])
+		getBoxes()
+		// getBoxes(accessToken, refreshToken)
 	}, [])
 
 	useEffect(() => {
 		console.log("boxes", boxes)
 	}, [boxes])
 
-	async function getBoxes(accessToken, refreshToken) {
+	async function getBoxes() {
+		// async function getBoxes(accessToken, refreshToken) {
 		const url = dbHost + "/user/boxes"
 		try {
-			const boxes = await fetchWithToken(url, accessToken, refreshToken)
+			const boxes = await fetchWithToken(url)
+			// const boxes = await fetchWithToken(url, accessToken, refreshToken)
 			setBoxes(boxes)
 		} catch (error) {
 			console.error("Error getting boxes:", error)

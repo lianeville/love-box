@@ -51,6 +51,8 @@ function generateRefreshToken(user) {
 async function loginUser(email, password) {
 	try {
 		// Check if the user with the provided email exists in the database
+		// console.log(client)
+		console.log("hi")
 		const user = await usersCollection.findOne({ email })
 		if (!user) {
 			throw new Error("User not found")
@@ -118,7 +120,8 @@ app.post("/login", async (req, res) => {
 app.get("/refresh-token", async (req, res) => {
 	let refreshToken = req.headers.refresh
 
-	if (!refreshToken) {
+	if (refreshToken == "undefined") {
+		console.log("Invalid refresh token")
 		return res.status(401).json({ error: "Unauthorized - Missing tokens" })
 	}
 
@@ -149,7 +152,8 @@ app.get("/refresh-token", async (req, res) => {
 app.get("/user/boxes", async (req, res) => {
 	const accessToken = req.headers.access
 
-	if (!accessToken) {
+	if (accessToken == "undefined") {
+		console.log("Invalid access token")
 		return res.status(401).json({ error: "Unauthorized - Missing token" })
 	}
 
@@ -166,7 +170,7 @@ app.get("/user/boxes", async (req, res) => {
 		if (err.name == "TokenExpiredError") {
 			res.status(401).json({ error: "Access Token Expired" })
 		} else {
-			console.error("Error getting boxes:", err)
+			// console.error("Error getting boxes:", err)
 			res.status(401).json({ error: "Unauthorized - Invalid token" })
 		}
 	}

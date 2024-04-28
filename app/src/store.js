@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { fetchWithToken } from "./requests"
 const dbHost = import.meta.env.VITE_DB_HOST
 
 const useBoxStore = create(set => ({

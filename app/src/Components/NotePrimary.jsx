@@ -11,9 +11,13 @@ function NotePrimary({ positionY, cameraRef }) {
 	const noteLeftRef = useRef(null)
 	const noteRightRef = useRef(null)
 	const { isDraggingNote, setIsDraggingNote } = useNoteStore()
+	// let position = []
+	const [isAttachedToCam, setIsAttachedToCam] = useState(false)
+	const [position, setPosition] = useState([0, positionY, 0.39])
+	const [rotation, setRotation] = useState([0, 0, 0])
 
-	const leftMostNoteX = -2.25
-	const rightMostNoteX = 0.25
+	const leftMostNoteX = 3
+	const rightMostNoteX = 0.2
 
 	useEffect(() => {
 		loader.load("/src/assets/3D-Models/Note_Separated.glb", gltf => {
@@ -23,6 +27,14 @@ function NotePrimary({ positionY, cameraRef }) {
 		})
 	}, [])
 
+	// useEffect(() => {
+	// 	console.log(position)
+	// }, [position])
+
+	useEffect(() => {
+		setPosition([0, positionY, 0.39])
+	}, [positionY])
+
 	const gestures = useGesture({
 		onDrag: event => {
 			cameraRef.current.enableRotate = false
@@ -30,16 +42,16 @@ function NotePrimary({ positionY, cameraRef }) {
 			const note = noteRightRef.current.rotation
 
 			let rotation = (event.delta[0] *= 0.022)
+			rotation = -rotation
 
-			const intermediateValue = Math.max(
-				note.x + rotation,
-				leftMostNoteX - 0.25
-			)
-			const newRotationX = Math.min(intermediateValue, rightMostNoteX)
+			const leftMostValue = Math.min(note.y + rotation, leftMostNoteX + 0.25)
+			const newRotationX = Math.max(leftMostValue, rightMostNoteX - 0.25)
 
-			note.x = newRotationX
+			note.y = newRotationX
 		},
-		onDragStart: event => {},
+		onDragStart: event => {
+			// console.log(cameraRef.current.object)
+		},
 		onDragEnd: () => {
 			cameraRef.current.enableRotate = true
 			const note = noteRightRef.current.rotation
@@ -48,13 +60,50 @@ function NotePrimary({ positionY, cameraRef }) {
 	})
 
 	function checkNoteRotation(note) {
-		let finalX = note.x < -1.5 ? leftMostNoteX : rightMostNoteX - 0.25
+		let open = note.y > 1.5
+
+		let finalY = rightMostNoteX
+		if (open) {
+			finalY = leftMostNoteX
+		}
 
 		gsap.to(note, {
-			x: finalX,
+			y: finalY,
 			duration: 0.25,
 			ease: "power2.out",
 		})
+	}
+
+	function rotatePositionNote() {
+		const camera = cameraRef.current.object
+		const filmGauge = camera.filmGauge
+		const fov = camera.fov
+		const position = camera.position
+
+		const azi = cameraRef.current.getAzimuthalAngle()
+		const polar = cameraRef.current.getPolarAngle()
+
+		console.log("azi", azi)
+		console.log("polar", polar)
+
+		let xRotate = rotation[0]
+		let yRotate = rotation[1]
+		let zRotate = rotation[2]
+		// const rotation = [xRotate, yRotate, zRotate]
+
+		yRotate += 0.1
+		console.log(yRotate)
+
+		const finalRotate = [xRotate, yRotate, zRotate]
+
+		setRotation(finalRotate)
+
+		const x = position.x / fov
+		const y = position.y / fov
+		const z = position.z / fov
+
+		const cameraPos = [x, y, z]
+		setPosition(cameraPos)
 	}
 
 	function checkIntersections(e) {
@@ -70,17 +119,20 @@ function NotePrimary({ positionY, cameraRef }) {
 		<>
 			{scene && (
 				<group
-					position={[0, positionY, 0.39]}
-					rotation={[0, Math.PI * 0.8, Math.PI / 2]}
+					position={position}
+					// rotation={[0, Math.PI * 0.8, Math.PI / 2]}
 					scale={0.9}
+					// onClick={rotatePositionNote}
 				>
-					<primitive object={noteLeftRef.current} />
+					<group rotation={rotation}>
+						<primitive object={noteLeftRef.current} />
 
-					<group
-						onPointerDown={checkIntersections}
-						onPointerUp={disableDragging}
-					>
-						<primitive {...gestures()} object={noteRightRef.current} />
+						<group
+							onPointerDown={checkIntersections}
+							onPointerUp={disableDragging}
+						>
+							<primitive {...gestures()} object={noteRightRef.current} />
+						</group>
 					</group>
 				</group>
 			)}

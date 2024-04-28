@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Canvas } from "@react-three/fiber/"
 import TreasureChest from "./Components/Boxes/TreasureChest"
 import { Physics } from "@react-three/rapier"
@@ -8,6 +8,7 @@ import { useBoxStore } from "./store"
 function ModelViewer() {
 	const { activeBox, loadBox } = useBoxStore()
 	const [noteCount, setNoteCount] = useState(0)
+	const perspectiveCamRef = useRef(null)
 
 	useEffect(() => {
 		loadBox("6619e6838f8673bd5fd0a994")
@@ -24,12 +25,16 @@ function ModelViewer() {
 			<directionalLight position={[0, 0, 2]} intensity={1} />
 
 			<Physics>
-				<TreasureChest noteCount={noteCount} />
+				<TreasureChest
+					perspectiveCamRef={perspectiveCamRef}
+					noteCount={noteCount}
+				/>
 			</Physics>
 
 			<PerspectiveCamera
 				makeDefault
 				zoom={0.55}
+				ref={perspectiveCamRef}
 				near={1}
 				far={2000}
 				position={[0, 0, 200]}
