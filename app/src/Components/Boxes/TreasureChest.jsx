@@ -10,7 +10,7 @@ import { useNoteStore } from "../../store"
 import Note from "../Note"
 import ChestCollider from "../Colliders/ChestCollider"
 
-function TreasureChest({ noteCount, perspectiveCamRef }) {
+function TreasureChest({ noteCount }) {
 	const loader = new GLTFLoader()
 	const chestLidRef = useRef(null)
 	const chestBaseRef = useRef(null)
@@ -21,6 +21,8 @@ function TreasureChest({ noteCount, perspectiveCamRef }) {
 	const [primaryNotePos, setPrimaryNotePos] = useState(dampenY(lidMinX))
 	const [dragInitialX, setDragInitialX] = useState(lidMaxX)
 	const { isDraggingNote, setIsDraggingNote } = useNoteStore()
+
+	useEffect(() => {}, [cameraRef])
 
 	useEffect(() => {
 		loadModels()
@@ -67,6 +69,7 @@ function TreasureChest({ noteCount, perspectiveCamRef }) {
 
 	const lidGestures = useGesture({
 		onDrag: event => {
+			// console.log(isDraggingNote)
 			if (isDraggingNote) return
 
 			cameraRef.current.enableRotate = false

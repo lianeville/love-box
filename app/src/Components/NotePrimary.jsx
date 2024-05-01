@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, useMemo } from "react"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { RigidBody } from "@react-three/rapier"
 import { useGesture } from "@use-gesture/react"
-import { useNoteStore } from "../store"
+import { useNoteStore, useCamStore } from "../store"
 import gsap from "gsap"
 
 function NotePrimary({ positionY, cameraRef }) {
@@ -10,11 +10,11 @@ function NotePrimary({ positionY, cameraRef }) {
 	const [scene, setScene] = useState(null)
 	const noteLeftRef = useRef(null)
 	const noteRightRef = useRef(null)
-	const { isDraggingNote, setIsDraggingNote } = useNoteStore()
-	// let position = []
-	const [isAttachedToCam, setIsAttachedToCam] = useState(false)
+	const { setIsDraggingNote } = useNoteStore()
+
 	const [position, setPosition] = useState([0, positionY, 0.39])
 	const [rotation, setRotation] = useState([0, 0, 0])
+	const { resetCamPos } = useCamStore()
 
 	const leftMostNoteX = 3
 	const rightMostNoteX = 0.2
@@ -27,17 +27,13 @@ function NotePrimary({ positionY, cameraRef }) {
 		})
 	}, [])
 
-	// useEffect(() => {
-	// 	console.log(position)
-	// }, [position])
-
 	useEffect(() => {
 		setPosition([0, positionY, 0.39])
 	}, [positionY])
 
 	const gestures = useGesture({
 		onDrag: event => {
-			cameraRef.current.enableRotate = false
+			cameraRef.enableRotate = false
 
 			const note = noteRightRef.current.rotation
 
@@ -50,10 +46,10 @@ function NotePrimary({ positionY, cameraRef }) {
 			note.y = newRotationX
 		},
 		onDragStart: event => {
-			// console.log(cameraRef.current.object)
+			// console.log(cameraRef.object)
 		},
 		onDragEnd: () => {
-			cameraRef.current.enableRotate = true
+			cameraRef.enableRotate = true
 			const note = noteRightRef.current.rotation
 			checkNoteRotation(note)
 		},
@@ -65,6 +61,7 @@ function NotePrimary({ positionY, cameraRef }) {
 		let finalY = rightMostNoteX
 		if (open) {
 			finalY = leftMostNoteX
+			resetCamPos()
 		}
 
 		gsap.to(note, {
@@ -74,36 +71,34 @@ function NotePrimary({ positionY, cameraRef }) {
 		})
 	}
 
+	// function resetCamPos() {
+	// 	// cameraRef.object.position = initialCamPos
+	// 	console.log(cameraRef)
+	// 	// cameraRef.reset()
+	// }
+
 	function rotatePositionNote() {
-		const camera = cameraRef.current.object
-		const filmGauge = camera.filmGauge
-		const fov = camera.fov
-		const position = camera.position
-
-		const azi = cameraRef.current.getAzimuthalAngle()
-		const polar = cameraRef.current.getPolarAngle()
-
-		console.log("azi", azi)
-		console.log("polar", polar)
-
-		let xRotate = rotation[0]
-		let yRotate = rotation[1]
-		let zRotate = rotation[2]
-		// const rotation = [xRotate, yRotate, zRotate]
-
-		yRotate += 0.1
-		console.log(yRotate)
-
-		const finalRotate = [xRotate, yRotate, zRotate]
-
-		setRotation(finalRotate)
-
-		const x = position.x / fov
-		const y = position.y / fov
-		const z = position.z / fov
-
-		const cameraPos = [x, y, z]
-		setPosition(cameraPos)
+		// const camera = cameraRef.object
+		// const filmGauge = camera.filmGauge
+		// const fov = camera.fov
+		// const position = camera.position
+		// const azi = cameraRef.getAzimuthalAngle()
+		// const polar = cameraRef.getPolarAngle()
+		// console.log("azi", azi)
+		// console.log("polar", polar)
+		// let xRotate = rotation[0]
+		// let yRotate = rotation[1]
+		// let zRotate = rotation[2]
+		// // const rotation = [xRotate, yRotate, zRotate]
+		// yRotate += 0.1
+		// console.log(yRotate)
+		// const finalRotate = [xRotate, yRotate, zRotate]
+		// setRotation(finalRotate)
+		// const x = position.x / fov
+		// const y = position.y / fov
+		// const z = position.z / fov
+		// const cameraPos = [x, y, z]
+		// setPosition(cameraPos)
 	}
 
 	function checkIntersections(e) {
@@ -130,6 +125,7 @@ function NotePrimary({ positionY, cameraRef }) {
 						<group
 							onPointerDown={checkIntersections}
 							onPointerUp={disableDragging}
+							onPointerOut={disableDragging}
 						>
 							<primitive {...gestures()} object={noteRightRef.current} />
 						</group>
