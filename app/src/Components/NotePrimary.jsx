@@ -3,9 +3,10 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { RigidBody } from "@react-three/rapier"
 import { useGesture } from "@use-gesture/react"
 import { useNoteStore, useCamStore } from "../store"
+import easePosition from "../helpers"
 import gsap from "gsap"
 
-function NotePrimary({ positionY, cameraRef }) {
+function NotePrimary({ positionY, setCanRotateCam }) {
 	const loader = new GLTFLoader()
 	const [scene, setScene] = useState(null)
 	const noteLeftRef = useRef(null)
@@ -33,7 +34,7 @@ function NotePrimary({ positionY, cameraRef }) {
 
 	const gestures = useGesture({
 		onDrag: event => {
-			cameraRef.enableRotate = false
+			setCanRotateCam(false)
 
 			const note = noteRightRef.current.rotation
 
@@ -49,7 +50,7 @@ function NotePrimary({ positionY, cameraRef }) {
 			// console.log(cameraRef.object)
 		},
 		onDragEnd: () => {
-			cameraRef.enableRotate = true
+			setCanRotateCam(true)
 			const note = noteRightRef.current.rotation
 			checkNoteRotation(note)
 		},
@@ -62,6 +63,9 @@ function NotePrimary({ positionY, cameraRef }) {
 		if (open) {
 			finalY = leftMostNoteX
 			resetCamPos()
+			featureNote()
+		} else {
+			dismissNote()
 		}
 
 		gsap.to(note, {
@@ -71,39 +75,24 @@ function NotePrimary({ positionY, cameraRef }) {
 		})
 	}
 
-	// function resetCamPos() {
-	// 	// cameraRef.object.position = initialCamPos
-	// 	console.log(cameraRef)
-	// 	// cameraRef.reset()
-	// }
+	function featureNote() {
+		console.log("featuring")
+		const endPos = [0, 0.8, 3.5]
+		easePosition(position, endPos, 200, setPosition)
+		// easePosition(startPos, endPos, duration, set, "camPos") // Pass the set function to update camPos
+	}
 
-	function rotatePositionNote() {
-		// const camera = cameraRef.object
-		// const filmGauge = camera.filmGauge
-		// const fov = camera.fov
-		// const position = camera.position
-		// const azi = cameraRef.getAzimuthalAngle()
-		// const polar = cameraRef.getPolarAngle()
-		// console.log("azi", azi)
-		// console.log("polar", polar)
-		// let xRotate = rotation[0]
-		// let yRotate = rotation[1]
-		// let zRotate = rotation[2]
-		// // const rotation = [xRotate, yRotate, zRotate]
-		// yRotate += 0.1
-		// console.log(yRotate)
-		// const finalRotate = [xRotate, yRotate, zRotate]
-		// setRotation(finalRotate)
-		// const x = position.x / fov
-		// const y = position.y / fov
-		// const z = position.z / fov
-		// const cameraPos = [x, y, z]
-		// setPosition(cameraPos)
+	function dismissNote() {
+		console.log("dismissing")
+		const endPos = [0, 0.8, 0.39]
+		easePosition(position, endPos, 200, setPosition)
 	}
 
 	function checkIntersections(e) {
 		const closestMesh = e.intersections[0].object.name
-		if (closestMesh == "PlaneRight") setIsDraggingNote(true)
+		if (closestMesh == "PlaneRight") {
+			setIsDraggingNote(true)
+		}
 	}
 
 	function disableDragging() {

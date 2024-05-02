@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react"
 import { Canvas } from "@react-three/fiber/"
 import TreasureChest from "./Components/Boxes/TreasureChest"
 import { Physics } from "@react-three/rapier"
-import { OrthographicCamera, PerspectiveCamera } from "@react-three/drei"
+import { PerspectiveCamera } from "@react-three/drei"
 import { useBoxStore, useCamStore } from "./store"
 
 function ModelViewer() {

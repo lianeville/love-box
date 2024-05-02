@@ -21,12 +21,12 @@ function TreasureChest({ noteCount }) {
 	const [primaryNotePos, setPrimaryNotePos] = useState(dampenY(lidMinX))
 	const [dragInitialX, setDragInitialX] = useState(lidMaxX)
 	const { isDraggingNote, setIsDraggingNote } = useNoteStore()
+	const [canRotateCam, setCanRotateCam] = useState(true)
 
 	useEffect(() => {}, [cameraRef])
 
 	useEffect(() => {
 		loadModels()
-		// console.log("perspectiveCamRef", perspectiveCamRef.current)
 	}, [])
 
 	function dampenY(y) {
@@ -91,9 +91,11 @@ function TreasureChest({ noteCount }) {
 			const intermediateValue = Math.max(lid.x + rotation, lidMinX)
 			const newRotationX = Math.min(intermediateValue, lidMaxX)
 			lid.x = newRotationX
+			console.log("setting Note Y")
 			setPrimaryNotePos(dampenY(-newRotationX))
 		},
 		onDragStart: () => {
+			console.log("hi")
 			const lid = chestLidRef.current.rotation
 			setDragInitialX(lid.x)
 		},
@@ -119,6 +121,7 @@ function TreasureChest({ noteCount }) {
 						<NotePrimary
 							cameraRef={cameraRef}
 							positionY={primaryNotePos}
+							setCanRotateCam={setCanRotateCam}
 						/>
 
 						<primitive object={chestBaseRef.current} />
@@ -128,6 +131,7 @@ function TreasureChest({ noteCount }) {
 							target={[0, 0, 33]}
 							ref={cameraRef}
 							enableZoom={false}
+							enableRotate={canRotateCam}
 						/>
 					</group>
 				</>
