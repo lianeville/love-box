@@ -18,12 +18,10 @@ function TreasureChest({ noteCount }) {
 	const cameraRef = useRef(null)
 	const lidMinX = -1
 	const lidMaxX = 0.95
-	const [primaryNotePos, setPrimaryNotePos] = useState(dampenY(lidMinX))
+	// const [primaryNotePos, setPrimaryNotePos] = useState(dampenY(lidMinX))
 	const [dragInitialX, setDragInitialX] = useState(lidMaxX)
-	const { isDraggingNote, setIsDraggingNote } = useNoteStore()
+	const { isDraggingNote, setNoteRef, notePos, setNotePosY } = useNoteStore()
 	const [canRotateCam, setCanRotateCam] = useState(true)
-
-	useEffect(() => {}, [cameraRef])
 
 	useEffect(() => {
 		loadModels()
@@ -62,14 +60,19 @@ function TreasureChest({ noteCount }) {
 			duration: 0.25,
 			ease: "power2.out",
 			onUpdate: () => {
-				setPrimaryNotePos(dampenY(-lid.x))
+				if (isDraggingNote) return
+				setNotePosY(dampenY(-lid.x))
+				// setInterval(() => {
+				// 	if (!isDraggingNote) {
+				// 		setPrimaryNotePos(dampenY(-lid.x))
+				// 	}
+				// }, 50)
 			},
 		})
 	}
 
 	const lidGestures = useGesture({
 		onDrag: event => {
-			// console.log(isDraggingNote)
 			if (isDraggingNote) return
 
 			cameraRef.current.enableRotate = false
@@ -91,11 +94,13 @@ function TreasureChest({ noteCount }) {
 			const intermediateValue = Math.max(lid.x + rotation, lidMinX)
 			const newRotationX = Math.min(intermediateValue, lidMaxX)
 			lid.x = newRotationX
-			console.log("setting Note Y")
-			setPrimaryNotePos(dampenY(-newRotationX))
+
+			if (isDraggingNote) return
+			setNotePosY(dampenY(-newRotationX))
+			// setNotePos(noteEndPos, isFromChest)
+			// setPrimaryNotePos(dampenY(-newRotationX))
 		},
 		onDragStart: () => {
-			console.log("hi")
 			const lid = chestLidRef.current.rotation
 			setDragInitialX(lid.x)
 		},
@@ -119,9 +124,10 @@ function TreasureChest({ noteCount }) {
 						</RigidBody>
 
 						<NotePrimary
-							cameraRef={cameraRef}
-							positionY={primaryNotePos}
+							// positionY={primaryNotePos}
 							setCanRotateCam={setCanRotateCam}
+							innerRef={setNoteRef}
+							position={notePos}
 						/>
 
 						<primitive object={chestBaseRef.current} />

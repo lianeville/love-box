@@ -12,12 +12,20 @@ export default function easePosition(
 	let startTime = null
 	let intervalId = null
 
-	const updateCamPos = () => {
+	console.log("starting:", startArray)
+	console.log("ending:", endPos)
+
+	const updatePos = () => {
 		const currentTime = Date.now()
 		const elapsedTime = currentTime - startTime
 
 		if (elapsedTime >= duration) {
 			clearInterval(intervalId)
+			if (propName != null) {
+				setFunc({ [propName]: endPos })
+			} else {
+				setFunc(endPos)
+			}
 		} else {
 			const progress = easeInOutCubic(elapsedTime / duration)
 			const newPos = [
@@ -25,6 +33,7 @@ export default function easePosition(
 				getValueBetween(startArray[1], endPos[1], progress),
 				getValueBetween(startArray[2], endPos[2], progress),
 			]
+			// console.log(newPos)
 			// If using in a store, update the position
 			if (propName != null) {
 				setFunc({ [propName]: newPos })
@@ -35,7 +44,7 @@ export default function easePosition(
 	}
 
 	startTime = Date.now()
-	intervalId = setInterval(updateCamPos, 16)
+	intervalId = setInterval(updatePos, 16)
 }
 
 function easeInOutCubic(t) {

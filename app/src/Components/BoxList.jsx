@@ -16,7 +16,7 @@ function BoxList() {
 	}, [])
 
 	useEffect(() => {
-		console.log("boxes", boxes)
+		// console.log("boxes", boxes)
 	}, [boxes])
 
 	async function getBoxes() {

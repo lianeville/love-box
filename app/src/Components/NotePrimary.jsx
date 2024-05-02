@@ -6,14 +6,13 @@ import { useNoteStore, useCamStore } from "../store"
 import easePosition from "../helpers"
 import gsap from "gsap"
 
-function NotePrimary({ positionY, setCanRotateCam }) {
+function NotePrimary({ setCanRotateCam, innerRef }) {
 	const loader = new GLTFLoader()
 	const [scene, setScene] = useState(null)
 	const noteLeftRef = useRef(null)
 	const noteRightRef = useRef(null)
-	const { setIsDraggingNote } = useNoteStore()
+	const { setIsDraggingNote, notePos, setNotePos } = useNoteStore()
 
-	const [position, setPosition] = useState([0, positionY, 0.39])
 	const [rotation, setRotation] = useState([0, 0, 0])
 	const { resetCamPos } = useCamStore()
 
@@ -28,9 +27,9 @@ function NotePrimary({ positionY, setCanRotateCam }) {
 		})
 	}, [])
 
-	useEffect(() => {
-		setPosition([0, positionY, 0.39])
-	}, [positionY])
+	// useEffect(() => {
+	// 	setPosition([0, positionY, 0.39])
+	// }, [positionY])
 
 	const gestures = useGesture({
 		onDrag: event => {
@@ -46,9 +45,7 @@ function NotePrimary({ positionY, setCanRotateCam }) {
 
 			note.y = newRotationX
 		},
-		onDragStart: event => {
-			// console.log(cameraRef.object)
-		},
+		onDragStart: event => {},
 		onDragEnd: () => {
 			setCanRotateCam(true)
 			const note = noteRightRef.current.rotation
@@ -62,7 +59,7 @@ function NotePrimary({ positionY, setCanRotateCam }) {
 		let finalY = rightMostNoteX
 		if (open) {
 			finalY = leftMostNoteX
-			resetCamPos()
+			// resetCamPos()
 			featureNote()
 		} else {
 			dismissNote()
@@ -76,16 +73,13 @@ function NotePrimary({ positionY, setCanRotateCam }) {
 	}
 
 	function featureNote() {
-		console.log("featuring")
 		const endPos = [0, 0.8, 3.5]
-		easePosition(position, endPos, 200, setPosition)
-		// easePosition(startPos, endPos, duration, set, "camPos") // Pass the set function to update camPos
+		setNotePos(endPos)
 	}
 
 	function dismissNote() {
-		console.log("dismissing")
 		const endPos = [0, 0.8, 0.39]
-		easePosition(position, endPos, 200, setPosition)
+		setNotePos(endPos)
 	}
 
 	function checkIntersections(e) {
@@ -96,14 +90,17 @@ function NotePrimary({ positionY, setCanRotateCam }) {
 	}
 
 	function disableDragging() {
-		setIsDraggingNote(false)
+		setTimeout(() => {
+			setIsDraggingNote(false)
+		}, 200)
 	}
 
 	return (
 		<>
 			{scene && (
 				<group
-					position={position}
+					ref={innerRef}
+					position={notePos}
 					// rotation={[0, Math.PI * 0.8, Math.PI / 2]}
 					scale={0.9}
 					// onClick={rotatePositionNote}

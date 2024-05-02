@@ -51,8 +51,6 @@ function generateRefreshToken(user) {
 async function loginUser(email, password) {
 	try {
 		// Check if the user with the provided email exists in the database
-		// console.log(client)
-		console.log("hi")
 		const user = await usersCollection.findOne({ email })
 		if (!user) {
 			throw new Error("User not found")
