@@ -15,9 +15,9 @@ function BoxList() {
 		// getBoxes(accessToken, refreshToken)
 	}, [])
 
-	useEffect(() => {
-		// console.log("boxes", boxes)
-	}, [boxes])
+	// useEffect(() => {
+	// 	console.log("boxes", boxes)
+	// }, [boxes])
 
 	async function getBoxes() {
 		// async function getBoxes(accessToken, refreshToken) {

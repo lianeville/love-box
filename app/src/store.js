@@ -2,7 +2,7 @@ import { create } from "zustand"
 import { fetchWithToken } from "./requests"
 const dbHost = import.meta.env.VITE_DB_HOST
 import gsap from "gsap"
-import easePosition from "./helpers"
+import { easePosition, easeNumber } from "./helpers"
 
 gsap.registerPlugin()
 
@@ -27,52 +27,71 @@ const useBoxStore = create(set => ({
 
 const useNoteStore = create((set, get) => ({
 	noteRef: null,
-	isDraggingNote: false,
-	notePos: [0, 0.8, 0.39],
 	setNoteRef: noteRef => {
 		set({ noteRef: noteRef })
 	},
+	isDraggingNote: false,
 	setIsDraggingNote: isDragging => {
-		if (isDragging) {
-			console.log("dragging.")
-		} else {
-			console.log("no longer dragging")
-		}
 		set({ isDraggingNote: isDragging })
 	},
-	setNotePos: endPos => {
-		// if (get().isDraggingNote) return
-
+	notePos: [0, 0.8, 0.39],
+	setNotePos: pos => {
+		set({ notePos: pos })
+	},
+	moveNote: endPos => {
 		const duration = 250
 		const startPos = get().notePos
+		const setNotePos = get().setNotePos
 
-		easePosition(startPos, endPos, duration, set, "notePos") // Pass the set function to update camPos
+		easePosition(startPos, endPos, duration, setNotePos) // Pass the set function to update camPos
 
-		// setInterval(() => {
-		// 	console.log("setNotePosAfter", get().notePos)
-		// }, 100)
+		const depth = endPos[2]
+		if (depth == 0.39) {
+			set({ noteIsFeatured: false })
+		} else if (depth == 3.5) {
+			set({ noteIsFeatured: true })
+		}
 	},
-	setNotePosY: yPos => {
+	moveNoteY: yPos => {
 		if (get().isDraggingNote) return
-		// console.log("isDraggingNote", get().isDraggingNote)
-		// console.log("setting Y:")
+
 		set({ notePos: [0, yPos, 0.39] })
+	},
+	noteIsFeatured: false,
+	foldRotationY: 0.2,
+	setFoldRotationY: yPos => {
+		set({ foldRotationY: yPos })
+	},
+	openNote: () => {
+		set({ foldRotationY: yPos })
+	},
+	setEaseFoldRotationY: yPos => {
+		const startY = get().foldRotationY
+		const endY = yPos
+		const duration = 250
+		const setFoldRotationY = get().setFoldRotationY
+
+		easeNumber(startY, endY, duration, setFoldRotationY)
 	},
 }))
 
 // In your store or component:
 const useCamStore = create((set, get) => ({
 	camRef: null,
-	camPos: [0, 45, 200],
 	setCamRef: camRef => {
 		set({ camRef: camRef })
+	},
+	camPos: [0, 45, 200],
+	setCamPos: pos => {
+		set({ camPos: pos })
 	},
 	resetCamPos: () => {
 		const duration = 250 // Duration in milliseconds
 		const startPos = get().camRef.position // Get initial position from camRef
 		const endPos = [0, 45, 200] // Default end position
+		const setCamPos = get().setCamPos
 
-		easePosition(startPos, endPos, duration, set, "camPos") // Pass the set function to update camPos
+		easePosition(startPos, endPos, duration, setCamPos) // Pass the set function to update camPos
 	},
 }))
 

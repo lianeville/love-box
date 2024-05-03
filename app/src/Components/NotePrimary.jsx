@@ -3,7 +3,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { RigidBody } from "@react-three/rapier"
 import { useGesture } from "@use-gesture/react"
 import { useNoteStore, useCamStore } from "../store"
-import easePosition from "../helpers"
+import { easeNumber } from "../helpers"
 import gsap from "gsap"
 
 function NotePrimary({ setCanRotateCam, innerRef }) {
@@ -11,9 +11,16 @@ function NotePrimary({ setCanRotateCam, innerRef }) {
 	const [scene, setScene] = useState(null)
 	const noteLeftRef = useRef(null)
 	const noteRightRef = useRef(null)
-	const { setIsDraggingNote, notePos, setNotePos } = useNoteStore()
+	const {
+		setIsDraggingNote,
+		notePos,
+		moveNote,
+		foldRotationY,
+		setFoldRotationY,
+		setEaseFoldRotationY,
+	} = useNoteStore()
 
-	const [rotation, setRotation] = useState([0, 0, 0])
+	// const [rotation, setRotation] = useState([0, 0, 0])
 	const { resetCamPos } = useCamStore()
 
 	const leftMostNoteX = 3
@@ -35,51 +42,54 @@ function NotePrimary({ setCanRotateCam, innerRef }) {
 		onDrag: event => {
 			setCanRotateCam(false)
 
-			const note = noteRightRef.current.rotation
+			// const note = noteRightRef.current.rotation
 
-			let rotation = (event.delta[0] *= 0.022)
+			let rotation = (event.delta[0] *= 0.045)
 			rotation = -rotation
 
-			const leftMostValue = Math.min(note.y + rotation, leftMostNoteX + 0.25)
+			const leftMostValue = Math.min(
+				foldRotationY + rotation,
+				leftMostNoteX + 0.25
+			)
 			const newRotationX = Math.max(leftMostValue, rightMostNoteX - 0.25)
 
-			note.y = newRotationX
+			setFoldRotationY(newRotationX)
 		},
 		onDragStart: event => {},
 		onDragEnd: () => {
 			setCanRotateCam(true)
-			const note = noteRightRef.current.rotation
-			checkNoteRotation(note)
+			checkNoteRotation()
 		},
 	})
 
-	function checkNoteRotation(note) {
-		let open = note.y > 1.5
+	function checkNoteRotation() {
+		let open = foldRotationY > 1.5
 
 		let finalY = rightMostNoteX
 		if (open) {
 			finalY = leftMostNoteX
-			// resetCamPos()
+			resetCamPos()
 			featureNote()
 		} else {
 			dismissNote()
 		}
 
-		gsap.to(note, {
-			y: finalY,
-			duration: 0.25,
-			ease: "power2.out",
-		})
+		setEaseFoldRotationY(finalY)
+		// gsap.to(note, {
+		// 	y: finalY,
+		// 	duration: 0.25,
+		// 	ease: "power2.out",
+		// })
 	}
 
 	function featureNote() {
 		const endPos = [0, 0.8, 3.5]
-		setNotePos(endPos)
+		moveNote(endPos)
 	}
 
 	function dismissNote() {
 		const endPos = [0, 0.8, 0.39]
-		setNotePos(endPos)
+		moveNote(endPos)
 	}
 
 	function checkIntersections(e) {
@@ -98,14 +108,8 @@ function NotePrimary({ setCanRotateCam, innerRef }) {
 	return (
 		<>
 			{scene && (
-				<group
-					ref={innerRef}
-					position={notePos}
-					// rotation={[0, Math.PI * 0.8, Math.PI / 2]}
-					scale={0.9}
-					// onClick={rotatePositionNote}
-				>
-					<group rotation={rotation}>
+				<group ref={innerRef} position={notePos} scale={0.9}>
+					<group>
 						<primitive object={noteLeftRef.current} />
 
 						<group
@@ -113,7 +117,11 @@ function NotePrimary({ setCanRotateCam, innerRef }) {
 							onPointerUp={disableDragging}
 							onPointerOut={disableDragging}
 						>
-							<primitive {...gestures()} object={noteRightRef.current} />
+							<primitive
+								{...gestures()}
+								rotation-y={foldRotationY}
+								object={noteRightRef.current}
+							/>
 						</group>
 					</group>
 				</group>

@@ -1,10 +1,4 @@
-export default function easePosition(
-	startPos,
-	endPos,
-	duration,
-	setFunc,
-	propName
-) {
+const easePosition = (startPos, endPos, duration, setFunc, propName) => {
 	const startArray = Array.isArray(startPos)
 		? startPos
 		: [startPos.x, startPos.y, startPos.z]
@@ -12,20 +6,13 @@ export default function easePosition(
 	let startTime = null
 	let intervalId = null
 
-	console.log("starting:", startArray)
-	console.log("ending:", endPos)
-
 	const updatePos = () => {
 		const currentTime = Date.now()
 		const elapsedTime = currentTime - startTime
 
 		if (elapsedTime >= duration) {
 			clearInterval(intervalId)
-			if (propName != null) {
-				setFunc({ [propName]: endPos })
-			} else {
-				setFunc(endPos)
-			}
+			setFunc(endPos)
 		} else {
 			const progress = easeInOutCubic(elapsedTime / duration)
 			const newPos = [
@@ -33,18 +20,36 @@ export default function easePosition(
 				getValueBetween(startArray[1], endPos[1], progress),
 				getValueBetween(startArray[2], endPos[2], progress),
 			]
-			// console.log(newPos)
-			// If using in a store, update the position
-			if (propName != null) {
-				setFunc({ [propName]: newPos })
-			} else {
-				setFunc(newPos)
-			}
+			setFunc(newPos)
 		}
 	}
 
 	startTime = Date.now()
 	intervalId = setInterval(updatePos, 16)
+}
+
+const easeNumber = (startY, endY, duration, setFunc, propName) => {
+	let startTime = null
+	let intervalId = null
+
+	const updateNumber = () => {
+		const currentTime = Date.now()
+		const elapsedTime = currentTime - startTime
+
+		if (elapsedTime >= duration) {
+			clearInterval(intervalId)
+			// setFunc({ [propName]: endY })
+			setFunc(endY)
+		} else {
+			const progress = easeInOutCubic(elapsedTime / duration)
+			const newY = getValueBetween(startY, endY, progress)
+			setFunc(newY)
+			// setFunc({ [propName]: newY })
+		}
+	}
+
+	startTime = Date.now()
+	intervalId = setInterval(updateNumber, 16)
 }
 
 function easeInOutCubic(t) {
@@ -55,3 +60,5 @@ function getValueBetween(start, end, progress) {
 	progress = Math.max(0, Math.min(1, progress))
 	return start + (end - start) * progress
 }
+
+export { easePosition, easeNumber }

@@ -18,9 +18,9 @@ function TreasureChest({ noteCount }) {
 	const cameraRef = useRef(null)
 	const lidMinX = -1
 	const lidMaxX = 0.95
-	// const [primaryNotePos, setPrimaryNotePos] = useState(dampenY(lidMinX))
 	const [dragInitialX, setDragInitialX] = useState(lidMaxX)
-	const { isDraggingNote, setNoteRef, notePos, setNotePosY } = useNoteStore()
+	const { isDraggingNote, setNoteRef, notePos, setNotePos, moveNoteY } =
+		useNoteStore()
 	const [canRotateCam, setCanRotateCam] = useState(true)
 
 	useEffect(() => {
@@ -55,18 +55,18 @@ function TreasureChest({ noteCount }) {
 			finalX = lid.x > -0.65 ? lidMaxX : lidMinX
 		}
 
+		// if (finalX == lidMaxX) {
+		// 	const endNotePos = [0, dampenY(finalX), 0.39]
+		// 	setNotePos(endNotePos)
+		// }
+
 		gsap.to(lid, {
 			x: finalX,
 			duration: 0.25,
 			ease: "power2.out",
 			onUpdate: () => {
 				if (isDraggingNote) return
-				setNotePosY(dampenY(-lid.x))
-				// setInterval(() => {
-				// 	if (!isDraggingNote) {
-				// 		setPrimaryNotePos(dampenY(-lid.x))
-				// 	}
-				// }, 50)
+				moveNoteY(dampenY(-lid.x))
 			},
 		})
 	}
@@ -96,9 +96,7 @@ function TreasureChest({ noteCount }) {
 			lid.x = newRotationX
 
 			if (isDraggingNote) return
-			setNotePosY(dampenY(-newRotationX))
-			// setNotePos(noteEndPos, isFromChest)
-			// setPrimaryNotePos(dampenY(-newRotationX))
+			moveNoteY(dampenY(-newRotationX))
 		},
 		onDragStart: () => {
 			const lid = chestLidRef.current.rotation
@@ -124,7 +122,6 @@ function TreasureChest({ noteCount }) {
 						</RigidBody>
 
 						<NotePrimary
-							// positionY={primaryNotePos}
 							setCanRotateCam={setCanRotateCam}
 							innerRef={setNoteRef}
 							position={notePos}
